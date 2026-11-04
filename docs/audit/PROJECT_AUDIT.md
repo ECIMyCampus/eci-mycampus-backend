@@ -133,6 +133,7 @@ Se conservan todas en la nueva arquitectura.
 | L-03 | LOW | `previewFeatures = ["multiSchema"]` está obsoleto en la versión instalada. | `prisma validate` |
 | L-04 | LOW | La comprobación del dominio del correo distingue mayúsculas; `X@ESCUELAING.EDU.CO` se rechaza aunque luego se normaliza. | `auth.request.dto.ts` |
 | L-05 | LOW | `/docs` queda público en producción. Puede ser intencional. | `app.ts` |
+| L-06 | LOW | Fastify valida el cuerpo antes de los guards: una petición anónima con cuerpo inválido recibe 400 y no 401. Comportamiento original, conservado para no cambiar el contrato. | E2E; `POST /api/v1/events` |
 
 ## 7. Problemas arquitectónicos
 

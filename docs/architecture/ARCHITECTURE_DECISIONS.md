@@ -26,7 +26,7 @@ Registro de decisiones importantes. Para cambiar una, se agrega una entrada nuev
 
 - **Estado:** aceptada.
 - **Contexto:** se busca un único despliegue del backend; Next.js necesita su propio servidor.
-- **Decisión:** el frontend se despliega por separado y llega al backend mediante rewrites.
+- **Decisión:** la web se despliega por separado y llega al backend mediante rewrites.
 - **Alternativas:** servir Next dentro de Fastify con un servidor personalizado. Acopla dos ciclos de vida y pierde optimizaciones de Next a cambio de ahorrar un proceso.
 - **Consecuencias:** se despliegan dos procesos y una base, frente a los cuatro procesos anteriores.
 
@@ -63,3 +63,16 @@ Registro de decisiones importantes. Para cambiar una, se agrega una entrada nuev
 - **Decisión:** una prueba de Vitest que analiza las importaciones de `src/` y falla ante una ilegal.
 - **Alternativas:** `dependency-cruiser` o reglas de ESLint. Más potentes, pero añaden una dependencia y configuración que este caso simple no requiere.
 - **Consecuencias:** análisis por expresión regular, suficiente para importaciones estáticas. No detecta `require` dinámico, que el proyecto no usa.
+
+## ADR-008: la app móvil es el cliente principal previsto
+
+- **Estado:** aceptada como dirección; el repo móvil aún no existe.
+- **Contexto:** el equipo prevé tres repos (backend, web y móvil) y que la app móvil sea su producto fuerte.
+- **Decisión:** el backend trata `/api/v1/*` como contrato público, sin suponer que la web esté delante. Un repo propio alojará la app móvil.
+- **Alternativas:**
+  - *Compartir código con la web en un solo repo:* se descartó al elegir repos separados.
+  - *Reutilizar `eci-mycampus-starter` tal cual:* usa Firebase directamente y contiene una clave privada, así que no debe versionarse sin antes retirarla.
+- **Consecuencias:**
+  - El JWT Bearer ya es adecuado; CORS no afecta a clientes nativos.
+  - Sube la prioridad de verificar correos, limitar intentos y renovar tokens (H-02, H-03, M-02), pues la API queda expuesta directamente y los tokens viven en dispositivos.
+  - Cambiar el contrato afectará a apps ya instaladas que no se actualizan de inmediato: los cambios incompatibles deben ir en una versión nueva de la ruta (`/api/v2`).
