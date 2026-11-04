@@ -1,62 +1,55 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { authService } from '../services/auth.service';
-import { registerInputSchema, loginInputSchema } from '../schemas/auth.schema';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { AuthMapper } from '../mappers/auth.mapper';
+import type { IPasswordHasher } from '../models/domain/types';
+import type { LoginRequestDTO, RegisterRequestDTO } from '../models/dto/request/auth.request.dto';
+import type { IAuthService } from '../services/auth.service';
 
 export class AuthController {
-  async register(request: FastifyRequest, reply: FastifyReply) {
-    const parseResult = registerInputSchema.safeParse(request.body);
-    if (!parseResult.success) {
-      return reply.status(422).send({
-        error: 'Unprocessable Entity',
-        issues: parseResult.error.format(),
-      });
-    }
+  constructor(
+    private readonly authService: IAuthService,
+    private readonly mapper: AuthMapper,
+    private readonly passwordHasher: IPasswordHasher,
+  ) {}
 
-    try {
-      const result = await authService.register(parseResult.data);
-      return reply.status(201).send({
-        message: 'Usuario registrado exitosamente',
-        user: result,
-      });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al registrar usuario';
-      return reply.status(409).send({ error: 'Conflict', message });
-    }
-  }
+  register = async (request: FastifyRequest<{ Body: RegisterRequestDTO }>, reply: FastifyReply) => {
+    const passwordHash = await this.passwordHasher.hash(request.body.password);
+    const draftUser = this.mapper.toDomain(request.body, passwordHash);
+    const created = await this.authService.register(draftUser);
 
-  async login(request: FastifyRequest, reply: FastifyReply) {
-    const parseResult = loginInputSchema.safeParse(request.body);
-    if (!parseResult.success) {
-      return reply.status(422).send({
-        error: 'Unprocessable Entity',
-        issues: parseResult.error.format(),
-      });
-    }
+    return reply.status(201).send({
+      message: 'Usuario registrado exitosamente',
+      user: this.mapper.toResponse(created),
+    });
+  };
 
-    try {
-      const user = await authService.login(parseResult.data);
-      // Generar JWT utilizando el plugin de Fastify
-      const token = await reply.jwtSign(
-        {
-          id: user.id,
-          email: user.email,
-          fullName: user.fullName,
-          role: user.role,
-          facultyId: user.facultyId,
-          isAuthorizedOrganizer: user.isAuthorizedOrganizer,
-        },
-        { expiresIn: '7d' }
-      );
+  login = async (request: FastifyRequest<{ Body: LoginRequestDTO }>, reply: FastifyReply) => {
+    const user = await this.authService.login({
+      email: request.body.email,
+      password: request.body.password,
+      ipAddress: request.ip,
+    });
 
-      return reply.status(200).send({
-        token,
-        user,
-      });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error de autenticación';
-      return reply.status(401).send({ error: 'Unauthorized', message });
-    }
-  }
+    const token = await reply.jwtSign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        facultyId: user.facultyId,
+        isAuthorizedOrganizer: user.isAuthorizedOrganizer,
+        fullName: user.fullName,
+      },
+      { expiresIn: '7d' },
+    );
+
+    return reply.status(200).send({
+      token,
+      user: this.mapper.toResponse(user),
+    });
+  };
+
+  me = async (request: FastifyRequest, reply: FastifyReply) => {
+    const actor = (request as unknown as { user: { id: string } }).user;
+    const user = await this.authService.getUserById(actor.id);
+    return reply.status(200).send(this.mapper.toResponse(user));
+  };
 }
-
-export const authController = new AuthController();
