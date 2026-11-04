@@ -24,7 +24,7 @@ export const RegisterRequestSchema = z
     academicProgram: z.string().trim().max(100).optional(),
     interests: z.array(z.string().trim().max(50)).default([]),
     habeasDataAccepted: z.literal(true, {
-      errorMap: () => ({ message: 'Debe aceptar la política de tratamiento de datos (Habeas Data)' }),
+      error: 'Debe aceptar la política de tratamiento de datos (Habeas Data)',
     }),
   })
   .strict();

@@ -8,7 +8,7 @@ const EnvSchema = z
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().positive().default(4000),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL es obligatoria'),
-    JWT_SECRET: z.string({ required_error: 'JWT_SECRET es obligatorio' }).min(16),
+    JWT_SECRET: z.string({ error: 'JWT_SECRET es obligatorio' }).min(16),
     CORS_ORIGIN: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     EMAIL_FROM: z.string().default('ECI-MyCampus <no-reply@ecimycampus.dev>'),
