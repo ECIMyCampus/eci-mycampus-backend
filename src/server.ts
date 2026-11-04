@@ -1,58 +1,26 @@
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
-import jwt from '@fastify/jwt';
-import dotenv from 'dotenv';
-import { eventsRoutes } from './routes/events.routes';
+import 'dotenv/config';
+import { buildApp } from './app';
+import { loadConfig } from './config/env';
+import { buildContainer } from './container';
 
-dotenv.config();
+async function start(): Promise<void> {
+  const config = loadConfig();
+  const app = await buildApp(config, (logger) => buildContainer(config, logger));
 
-const jwtSecret = process.env.JWT_SECRET;
-if (!jwtSecret && process.env.NODE_ENV === 'production') {
-  console.error('[FATAL] JWT_SECRET es obligatorio en entorno de producción.');
-  process.exit(1);
-}
+  const shutdown = async (signal: string) => {
+    app.log.info({ signal }, 'Cerrando events-service...');
+    await app.close();
+    process.exit(0);
+  };
+  process.once('SIGINT', () => void shutdown('SIGINT'));
+  process.once('SIGTERM', () => void shutdown('SIGTERM'));
 
-const server = Fastify({
-  logger: {
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  },
-});
-
-server.register(cors, {
-  origin: process.env.CORS_ORIGIN || true,
-  credentials: true,
-});
-
-server.register(jwt, {
-  secret: jwtSecret || 'dev_jwt_secret_key_for_eci_mycampus_local_only',
-});
-
-// Middleware opcional para extraer usuario del JWT si viene en cabecera
-server.addHook('onRequest', async (request) => {
   try {
-    await request.jwtVerify();
-  } catch {
-    // Si no tiene token o expiró, request.user queda indefinido (visitante público)
-  }
-});
-
-// Health check
-server.get('/health', async () => {
-  return { status: 'ok', service: 'events-service', timestamp: new Date().toISOString() };
-});
-
-// Registrar rutas del dominio de eventos y radar
-server.register(eventsRoutes, { prefix: '/api/v1/events' });
-
-const start = async () => {
-  try {
-    const port = Number(process.env.PORT) || 4003;
-    await server.listen({ port, host: '0.0.0.0' });
-    console.log(`[events-service] Escuchando en http://localhost:${port}`);
+    await app.listen({ port: config.port, host: '0.0.0.0' });
   } catch (err) {
-    server.log.error(err);
+    app.log.error(err);
     process.exit(1);
   }
-};
+}
 
-start();
+void start();

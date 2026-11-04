@@ -1,60 +1,76 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { eventsService } from '../services/events.service';
-import { createEventSchema, radarQuerySchema } from '../schemas/events.schema';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { EventMapper } from '../mappers/event.mapper';
+import type {
+  EventCreationRequestDTO,
+  EventIdParamsDTO,
+  EventRejectionRequestDTO,
+  EventReportCreationRequestDTO,
+  RadarFilterRequestDTO,
+} from '../models/dto/request/event.request.dto';
+import { currentActor } from '../security/auth.guard';
+import type { IEventsService } from '../services/events.service';
 
+type WithParams = { Params: EventIdParamsDTO };
+
+/**
+ * Controlador delgado: la validación sintáctica (Zod), la autorización (guards)
+ * y el manejo de errores (GlobalErrorHandler) ocurren fuera de aquí.
+ * Cada método: DTO -> Domain (mapper) -> servicio -> Domain -> ResponseDTO.
+ */
 export class EventsController {
-  async getRadar(request: FastifyRequest, reply: FastifyReply) {
-    const parseResult = radarQuerySchema.safeParse(request.query);
-    if (!parseResult.success) {
-      return reply.status(400).send({ error: 'Bad Request', issues: parseResult.error.format() });
-    }
+  constructor(
+    private readonly eventsService: IEventsService,
+    private readonly mapper: EventMapper,
+  ) {}
 
-    try {
-      const user = (request as any).user;
-      const events = await eventsService.getRadarEvents(parseResult.data, user?.facultyId);
-      return reply.status(200).send(events);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al consultar Radar';
-      return reply.status(500).send({ error: 'Internal Server Error', message });
-    }
-  }
+  getRadar = async (request: FastifyRequest<{ Querystring: RadarFilterRequestDTO }>, reply: FastifyReply) => {
+    const criteria = this.mapper.toRadarCriteria(request.query, request.actor);
+    const entries = await this.eventsService.getRadar(criteria);
+    const now = new Date();
+    return reply.status(200).send(entries.map((entry) => this.mapper.toRadarResponse(entry, now)));
+  };
 
-  async createEvent(request: FastifyRequest, reply: FastifyReply) {
-    const parseResult = createEventSchema.safeParse(request.body);
-    if (!parseResult.success) {
-      return reply.status(422).send({ error: 'Unprocessable Entity', issues: parseResult.error.format() });
-    }
+  getEventById = async (request: FastifyRequest<WithParams>, reply: FastifyReply) => {
+    const event = await this.eventsService.getEventById(request.params.id, request.actor);
+    return reply.status(200).send(this.mapper.toResponse(event));
+  };
 
-    try {
-      const user = (request as any).user || { id: 'mock-user-id', fullName: 'Usuario Prueba', isAuthorizedOrganizer: false };
-      const event = await eventsService.createEvent(
-        parseResult.data,
-        user.id,
-        user.fullName,
-        user.isAuthorizedOrganizer
-      );
-      return reply.status(201).send(event);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al crear evento';
-      return reply.status(400).send({ error: 'Bad Request', message });
-    }
-  }
+  createEvent = async (request: FastifyRequest<{ Body: EventCreationRequestDTO }>, reply: FastifyReply) => {
+    const organizer = currentActor(request);
+    const created = await this.eventsService.createEvent(this.mapper.toDomain(request.body, organizer), organizer);
+    return reply.status(201).send(this.mapper.toResponse(created));
+  };
 
-  async registerToEvent(request: FastifyRequest, reply: FastifyReply) {
-    const { id } = request.params as { id: string };
-    const user = (request as any).user || { id: 'mock-user-id' };
+  approveEvent = async (request: FastifyRequest<WithParams>, reply: FastifyReply) => {
+    const event = await this.eventsService.approveEvent(request.params.id);
+    return reply.status(200).send(this.mapper.toResponse(event));
+  };
 
-    try {
-      const registration = await eventsService.reserveSeatAtomic(id, user.id);
-      return reply.status(200).send({
-        message: 'Inscripción confirmada exitosamente',
-        registration,
-      });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al reservar cupo';
-      return reply.status(409).send({ error: 'Conflict', message });
-    }
-  }
+  rejectEvent = async (
+    request: FastifyRequest<WithParams & { Body: EventRejectionRequestDTO }>,
+    reply: FastifyReply,
+  ) => {
+    const event = await this.eventsService.rejectEvent(request.params.id, request.body.reason);
+    return reply.status(200).send(this.mapper.toResponse(event));
+  };
+
+  cancelEvent = async (request: FastifyRequest<WithParams>, reply: FastifyReply) => {
+    const event = await this.eventsService.cancelEvent(request.params.id, currentActor(request));
+    return reply.status(200).send(this.mapper.toResponse(event));
+  };
+
+  registerToEvent = async (request: FastifyRequest<WithParams>, reply: FastifyReply) => {
+    const registration = await this.eventsService.registerAttendee(request.params.id, currentActor(request));
+    return reply.status(201).send(this.mapper.toRegistrationResponse(registration));
+  };
+
+  reportEvent = async (
+    request: FastifyRequest<WithParams & { Body: EventReportCreationRequestDTO }>,
+    reply: FastifyReply,
+  ) => {
+    const reporter = currentActor(request);
+    const report = this.mapper.toReportDomain(request.params.id, reporter.id, request.body);
+    const created = await this.eventsService.reportEvent(report, reporter);
+    return reply.status(201).send(this.mapper.toReportResponse(created));
+  };
 }
-
-export const eventsController = new EventsController();
