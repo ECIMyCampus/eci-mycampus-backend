@@ -142,6 +142,17 @@ describe('buildApp (núcleo del monolito)', () => {
     expect((await get('/probe/admin', student)).statusCode).toBe(403);
   });
 
+  it('el preflight CORS admite PATCH, que usan las rutas de moderación', async () => {
+    const res = await app.inject({
+      method: 'OPTIONS',
+      url: '/probe/rule',
+      headers: { origin: 'http://cliente.test', 'access-control-request-method': 'PATCH' },
+    });
+
+    expect(res.statusCode).toBe(204);
+    expect(res.headers['access-control-allow-methods']).toContain('PATCH');
+  });
+
   it('los mensajes por defecto siguen disponibles', () => {
     expect(DEFAULT_ERROR_MESSAGES.validation).toBe('La solicitud contiene datos inválidos.');
   });

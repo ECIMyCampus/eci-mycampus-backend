@@ -34,7 +34,12 @@ export async function buildApp(config: AppConfig, containerFactory: ContainerFac
   const container = containerFactory(app.log);
   app.addHook('onClose', async () => container.dispose());
 
-  await app.register(cors, { origin: config.corsOrigin, credentials: true });
+  await app.register(cors, {
+    origin: config.corsOrigin,
+    credentials: true,
+    // @fastify/cors 11 redujo el valor por defecto a GET, HEAD y POST; la API usa también PATCH.
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  });
   await app.register(jwt, { secret: config.jwtSecret });
   await app.register(authenticationPlugin);
 
