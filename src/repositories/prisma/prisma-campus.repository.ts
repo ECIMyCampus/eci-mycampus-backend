@@ -57,3 +57,4 @@ export class PrismaCampusRepository implements ICampusRepository {
     return entities.map((s) => this.entityMapper.toSportsDomain(s));
   }
 }
+

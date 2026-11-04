@@ -83,3 +83,4 @@ describe('AppException hierarchy', () => {
     expect(new BusinessRuleException('rule').statusCode).toBe(422);
   });
 });
+

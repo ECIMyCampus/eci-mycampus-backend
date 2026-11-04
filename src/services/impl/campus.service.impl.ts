@@ -28,3 +28,4 @@ export class CampusServiceImpl implements ICampusService {
     return this.campusRepository.findActiveSportsFacilities();
   }
 }
+

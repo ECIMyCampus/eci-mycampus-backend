@@ -24,3 +24,4 @@ export class SportsFacility {
     this.isActive = props.isActive;
   }
 }
+

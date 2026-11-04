@@ -5,3 +5,4 @@ export const BuildingParamsSchema = z.object({
 });
 
 export type BuildingParamsDTO = z.infer<typeof BuildingParamsSchema>;
+

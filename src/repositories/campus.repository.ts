@@ -8,3 +8,4 @@ export interface ICampusRepository {
   findActiveFaculties(): Promise<Faculty[]>;
   findActiveSportsFacilities(): Promise<SportsFacility[]>;
 }
+

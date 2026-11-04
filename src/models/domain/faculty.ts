@@ -24,3 +24,4 @@ export class Faculty {
     this.createdAt = props.createdAt;
   }
 }
+

@@ -53,3 +53,4 @@ export type CampusServiceResponseDTO = z.infer<typeof CampusServiceResponseSchem
 export type BuildingResponseDTO = z.infer<typeof BuildingResponseSchema>;
 export type FacultyResponseDTO = z.infer<typeof FacultyResponseSchema>;
 export type SportsFacilityResponseDTO = z.infer<typeof SportsFacilityResponseSchema>;
+

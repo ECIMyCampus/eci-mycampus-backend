@@ -105,3 +105,4 @@ export class Building {
     this.services = props.services ? [...props.services] : [];
   }
 }
+
