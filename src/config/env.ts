@@ -1,20 +1,21 @@
 import { z } from 'zod';
 
-const DEV_JWT_SECRET = 'dev_jwt_secret_key_for_eci_mycampus_local_only';
+/** Valor público de .env.example: válido para desarrollo local, nunca en producción. */
+const EXAMPLE_JWT_SECRET = 'dev_jwt_secret_key_for_eci_mycampus_local_only';
 
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().positive().default(4000),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL es obligatoria'),
-    JWT_SECRET: z.string().min(16).optional(),
+    JWT_SECRET: z.string({ required_error: 'JWT_SECRET es obligatorio' }).min(16),
     CORS_ORIGIN: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     EMAIL_FROM: z.string().default('ECI-MyCampus <no-reply@ecimycampus.dev>'),
   })
   .superRefine((env, ctx) => {
-    if (env.NODE_ENV === 'production' && !env.JWT_SECRET) {
-      ctx.addIssue({ code: 'custom', path: ['JWT_SECRET'], message: 'JWT_SECRET es obligatorio en producción' });
+    if (env.NODE_ENV === 'production' && env.JWT_SECRET === EXAMPLE_JWT_SECRET) {
+      ctx.addIssue({ code: 'custom', path: ['JWT_SECRET'], message: 'JWT_SECRET no puede ser el valor de ejemplo en producción' });
     }
   });
 
@@ -40,9 +41,18 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     nodeEnv: env.NODE_ENV,
     port: env.PORT,
     databaseUrl: env.DATABASE_URL,
-    jwtSecret: env.JWT_SECRET ?? DEV_JWT_SECRET,
-    corsOrigin: env.CORS_ORIGIN ? env.CORS_ORIGIN.split(',').map((o) => o.trim()) : true,
+    jwtSecret: env.JWT_SECRET,
+    corsOrigin: resolveCorsOrigin(env.CORS_ORIGIN, env.NODE_ENV),
     resendApiKey: env.RESEND_API_KEY || undefined,
     emailFrom: env.EMAIL_FROM,
   };
+}
+
+/**
+ * Sin CORS_ORIGIN, producción no habilita CORS: la web llega por rewrites del mismo origen
+ * y las apps móviles nativas no están sujetas a CORS. En desarrollo se refleja el origen.
+ */
+function resolveCorsOrigin(value: string | undefined, nodeEnv: AppConfig['nodeEnv']): AppConfig['corsOrigin'] {
+  if (value) return value.split(',').map((origin) => origin.trim());
+  return nodeEnv !== 'production';
 }
