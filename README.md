@@ -145,6 +145,16 @@ JWT_SECRET=<secreto-de-produccion> docker compose up --build
 
 Compose levanta PostgreSQL, aplica migraciones y arranca el backend en el puerto 4000. PostgreSQL solo escucha en `127.0.0.1`. Fuera de tu máquina, define también `POSTGRES_PASSWORD`. Si falta `JWT_SECRET`, el backend no arranca.
 
+## Historial
+
+Este repo consolida los servicios de autenticación, campus y eventos, cuyos repos ya se retiraron. Para consultar su historial original:
+
+```bash
+git log -- services/auth-service
+```
+
+Usa `campus-service` o `events-service` para los otros dos.
+
 ## Flujo Git
 
 | Rama | Uso |
