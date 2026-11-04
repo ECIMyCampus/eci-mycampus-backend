@@ -1,6 +1,6 @@
-import type { AuditLogEntry, IPasswordHasher } from '../../src/models/domain/types';
-import { User, UserProfile, type UserProps } from '../../src/models/domain/user';
-import type { IUserRepository } from '../../src/repositories/user.repository';
+import type { AuditLogEntry, IPasswordHasher } from '../../../src/modules/auth/models/domain/types';
+import { User, UserProfile, type UserProps } from '../../../src/modules/auth/models/domain/user';
+import type { IUserRepository } from '../../../src/modules/auth/repositories/user.repository';
 
 export class MockPasswordHasher implements IPasswordHasher {
   async hash(password: string): Promise<string> {

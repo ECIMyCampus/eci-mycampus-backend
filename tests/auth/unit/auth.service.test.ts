@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ConflictException, ResourceNotFoundException, UnauthorizedException } from '../../src/exceptions/app.exception';
-import { AuthServiceImpl } from '../../src/services/impl/auth.service.impl';
-import { AuthValidatorImpl } from '../../src/validators/impl/auth.validator.impl';
+import { ConflictException, ResourceNotFoundException, UnauthorizedException } from '../../../src/shared/errors/app.exception';
+import { AuthServiceImpl } from '../../../src/modules/auth/services/impl/auth.service.impl';
+import { AuthValidatorImpl } from '../../../src/modules/auth/validators/impl/auth.validator.impl';
 import { buildUser, InMemoryUserRepository, MockPasswordHasher } from '../support/fixtures';
 
 describe('AuthServiceImpl', () => {

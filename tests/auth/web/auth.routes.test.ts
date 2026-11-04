@@ -1,10 +1,11 @@
 import type { FastifyInstance } from 'fastify';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildApp } from '../../src/app';
-import type { AppConfig } from '../../src/config/env';
-import { AuthMapper } from '../../src/mappers/auth.mapper';
-import { AuthServiceImpl } from '../../src/services/impl/auth.service.impl';
-import { AuthValidatorImpl } from '../../src/validators/impl/auth.validator.impl';
+import { buildApp } from '../../../src/app';
+import { authHttpModule } from '../../../src/modules/auth/module';
+import type { AppConfig } from '../../../src/config/env';
+import { AuthMapper } from '../../../src/modules/auth/mappers/auth.mapper';
+import { AuthServiceImpl } from '../../../src/modules/auth/services/impl/auth.service.impl';
+import { AuthValidatorImpl } from '../../../src/modules/auth/validators/impl/auth.validator.impl';
 import { buildUser, InMemoryUserRepository, MockPasswordHasher } from '../support/fixtures';
 
 const config: AppConfig = {
@@ -13,6 +14,7 @@ const config: AppConfig = {
   databaseUrl: 'postgresql://unused',
   jwtSecret: 'test_jwt_secret_with_sufficient_length_123',
   corsOrigin: true,
+  emailFrom: 'test@ecimycampus.dev',
 };
 
 const validRegisterBody = {
@@ -37,9 +39,7 @@ describe('Auth API (Endpoints, Guards y Manejo de Errores)', () => {
     const mapper = new AuthMapper();
 
     app = await buildApp(config, () => ({
-      authService: service,
-      authMapper: mapper,
-      passwordHasher: hasher,
+      modules: [authHttpModule({ authService: service, authMapper: mapper, passwordHasher: hasher })],
       dispose: async () => {},
     }));
   });
@@ -54,7 +54,7 @@ describe('Auth API (Endpoints, Guards y Manejo de Errores)', () => {
 
     // Assert
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toMatchObject({ status: 'ok', service: 'auth-service' });
+    expect(res.json()).toMatchObject({ status: 'ok', service: 'eci-mycampus-backend' });
   });
 
   describe('POST /api/v1/auth/register', () => {

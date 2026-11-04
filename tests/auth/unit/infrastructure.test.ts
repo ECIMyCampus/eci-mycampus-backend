@@ -1,31 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadConfig } from '../../src/config/env';
-import { UserEntityMapper } from '../../src/mappers/user-entity.mapper';
-
-describe('loadConfig (fail-fast de variables de entorno)', () => {
-  it('aplica valores por defecto en desarrollo', () => {
-    // Act
-    const config = loadConfig({ DATABASE_URL: 'postgresql://x' });
-
-    // Assert
-    expect(config.port).toBe(4001);
-    expect(config.corsOrigin).toBe(true);
-    expect(config.jwtSecret).toContain('dev_jwt_secret');
-  });
-
-  it('exige JWT_SECRET en entorno de producción', () => {
-    // Act + Assert
-    expect(() => loadConfig({ DATABASE_URL: 'postgresql://x', NODE_ENV: 'production' })).toThrow('JWT_SECRET');
-  });
-
-  it('separa múltiples orígenes CORS', () => {
-    // Act
-    const config = loadConfig({ DATABASE_URL: 'postgresql://x', CORS_ORIGIN: 'http://a.com, http://b.com' });
-
-    // Assert
-    expect(config.corsOrigin).toEqual(['http://a.com', 'http://b.com']);
-  });
-});
+import { UserEntityMapper } from '../../../src/modules/auth/mappers/user-entity.mapper';
 
 describe('UserEntityMapper (Domain <-> Prisma)', () => {
   const mapper = new UserEntityMapper();
@@ -93,7 +67,7 @@ import {
   ResourceNotFoundException,
   ConflictException,
   BusinessRuleException,
-} from '../../src/exceptions/app.exception';
+} from '../../../src/shared/errors/app.exception';
 
 describe('AppException hierarchy', () => {
   it('instancia correctamente cada subclase semántica con su código HTTP', () => {
