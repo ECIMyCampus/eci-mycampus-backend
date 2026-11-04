@@ -25,7 +25,7 @@ La API queda en `http://localhost:4000`, y la documentación interactiva en `/do
 
 Si ya tienes PostgreSQL, omite el comando de Docker y ajusta `DATABASE_URL` en `.env`.
 
-Los catálogos del campus empiezan vacíos: todavía no hay seed. Tampoco hay endpoint para crear usuarios `MODERADOR` o `ADMIN`; hoy se asignan directamente en la base de datos.
+Para cargar el catálogo de demostración, ejecuta `npm run prisma:seed`. Es idempotente. Si defines `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD`, también crea un usuario `ADMIN`, porque aún no hay endpoint para gestionar roles. Otros roles se asignan en la base de datos.
 
 ## Variables de entorno
 
@@ -40,6 +40,7 @@ Solo `src/config/env.ts` las lee, y las valida al arrancar: si algo es inválido
 | `CORS_ORIGIN` | No | Ver abajo | Orígenes separados por coma |
 | `RESEND_API_KEY` | No | | Sin clave, los correos solo se escriben en el log |
 | `EMAIL_FROM` | No | `ECI-MyCampus <no-reply@ecimycampus.dev>` | Remitente de correos |
+| `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | No | | Solo para el seed. Las lee `prisma/seed.ts`, que no forma parte de la aplicación |
 
 Sin `CORS_ORIGIN`, `NODE_ENV=development` o `test` reflejan el origen de la petición; cualquier otro caso no habilita CORS. La web llega por rewrites del mismo origen y las apps móviles nativas no están sujetas a CORS, así que solo hace falta definirla si un navegador llama a la API desde otro dominio.
 
