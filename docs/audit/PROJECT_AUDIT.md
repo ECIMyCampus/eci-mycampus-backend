@@ -1,5 +1,7 @@
 # Auditoría del proyecto ECI-MyCampus
 
+> **Documento histórico:** describe el estado previo a la migración. Los repos de servicios que menciona ya se retiraron (ADR-011); su código e historial están en este repo.
+
 - **Fecha:** 2026-11-04
 - **Alcance:** repos `eci-mycampus-auth-service`, `eci-mycampus-campus-service`, `eci-mycampus-events-service`, `eci-mycampus-web` y carpeta local `eci-mycampus-starter`.
 - **Estado auditado:** rama `main` de este repositorio, que importa los tres servicios sin modificarlos, y rama `main` de `eci-mycampus-web`.

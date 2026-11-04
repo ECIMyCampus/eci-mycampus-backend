@@ -78,7 +78,7 @@ Están justificados en [`MODULAR_MONOLITH.md`](../architecture/MODULAR_MONOLITH.
 | `RecoverPasswordRequestSchema` | Sin ningún uso |
 | Dependencia `zod` en web | Sin ningún import |
 
-Siguen intactos: los tres repos de servicios, `main` de la web y `eci-mycampus-starter`. En el historial de `main` del backend sigue todo el código original.
+No se modificaron los tres repos de servicios, `main` de la web ni `eci-mycampus-starter`. Los repos de servicios se retiraron después (ADR-011), y todo el código original sigue en el historial de este repo.
 
 ## Archivos creados y modificados
 
@@ -127,7 +127,7 @@ Cada rama se integró a `develop` localmente con `--no-ff` tras validarse, como 
 3. Implementar verificación de correo y límite de intentos.
 4. Crear el repo móvil a partir de la API, sin copiar la clave ni Firebase de `eci-mycampus-starter`.
 5. Añadir seed y gestión de roles, para que la moderación sea alcanzable.
-6. Archivar los tres repos de servicios cuando `eci-mycampus-backend` esté en GitHub.
+6. ~~Archivar los tres repos de servicios~~. Hecho de otra forma: se retiraron de la organización (ADR-011).
 
 ## Árbol final del backend
 
@@ -159,7 +159,7 @@ eci-mycampus-backend/
 
 **Fecha:** 2026-11-04. Trabajo local, sin push.
 
-**Inventario real de ECIMyCampus.** No hay seis microservicios: hay seis repositorios, de los cuales tres son servicios ya consolidados aquí.
+**Inventario de ECIMyCampus en ese momento.** Los tres repos de servicios y `demo-repository` se retiraron después (ADR-011). No había seis microservicios: hay seis repositorios, de los cuales tres son servicios ya consolidados aquí.
 
 | Repo | Qué es | Ramas remotas | Estado |
 | :--- | :--- | :--- | :--- |
@@ -180,5 +180,15 @@ Ninguna rama local o remota de los repos vigentes queda sin integrar en `develop
 - Web: 4 de 4, build `standalone` correcto.
 - E2E con backend en producción y servidor `standalone`: catálogo sembrado, registro, login, creación de evento, 403 a estudiante, aprobación con el administrador del seed, inscripción y 409 sin cupo.
 
-**Sin verificar:** las imágenes Docker y la guía de Azure. El CI construye y prueba las imágenes, pero solo correrá cuando se suban estos cambios.
+**Sin verificar en ese momento:** las imágenes Docker y la guía de Azure.
+
+## Estado vigente
+
+Esta sección prevalece sobre lo anterior donde difieran.
+
+- **Repositorios:** ECIMyCampus tiene `eci-mycampus-backend` y `eci-mycampus-web`. Ambos están en GitHub, con `develop` como rama de trabajo.
+- **CI:** se ejecutó en GitHub y pasó en ambos repos, con Node 22 y Linux, incluidas las pruebas con PostgreSQL.
+- **Docker:** el CI construye las imágenes y las arranca. La del backend responde `/health/ready` contra PostgreSQL y la de la web responde en `/`. `docker compose up` completo solo se validó con `docker compose config`, sin ejecutarlo.
+- **Sin verificar:** la guía de Azure y el envío real de correos con Resend.
+- **`main`:** en la web sigue en el estado anterior a la migración. En el backend existe solo en local.
 
