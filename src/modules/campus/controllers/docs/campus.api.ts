@@ -5,7 +5,7 @@ import {
   FacultyResponseSchema,
   SportsFacilityResponseSchema,
 } from '../../models/dto/response/campus.response.dto';
-import { ErrorResponseSchema } from '../../models/dto/response/error.response.dto';
+import { ErrorResponseSchema } from '../../../../shared/errors/error.response.dto';
 
 const TAG = ['Campus e Infraestructura'];
 

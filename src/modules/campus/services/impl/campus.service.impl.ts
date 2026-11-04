@@ -1,4 +1,4 @@
-import { ResourceNotFoundException } from '../../exceptions/app.exception';
+import { ResourceNotFoundException } from '../../../../shared/errors/app.exception';
 import type { Building } from '../../models/domain/building';
 import type { Faculty } from '../../models/domain/faculty';
 import type { SportsFacility } from '../../models/domain/sports';
