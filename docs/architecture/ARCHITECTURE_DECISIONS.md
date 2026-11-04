@@ -102,7 +102,7 @@ Registro de decisiones importantes. Para cambiar una, se agrega una entrada nuev
 - **Decisión:** retirarlos de la organización. Quedan `eci-mycampus-backend` y `eci-mycampus-web`.
 - **Alternativas:** archivarlos. Conservaría sus URL, pero mantendría a la vista repos que ya no se deben usar.
 - **Consecuencias:**
-  - Este repo es la única fuente del código de los servicios. Su historial, con los autores originales, se consulta con `git log -- services/<nombre>-service`.
+  - Este repo es la única fuente del código de los servicios. Su historial, con los autores originales, se consulta con los comandos de la sección Historial del README.
   - Los PR, issues y ajustes de esos repos no se conservan. No tenían PR ni issues al revisarlos.
   - Los enlaces antiguos a esos repos dejan de funcionar.
 

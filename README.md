@@ -147,13 +147,13 @@ Compose levanta PostgreSQL, aplica migraciones y arranca el backend en el puerto
 
 ## Historial
 
-Este repo consolida los servicios de autenticación, campus y eventos, cuyos repos ya se retiraron. Para consultar su historial original:
+Este repo consolida los servicios de autenticación, campus y eventos, cuyos repos ya se retiraron. Para consultar su historial original, usa el último commit de cada servicio:
 
-```bash
-git log -- services/auth-service
-```
-
-Usa `campus-service` o `events-service` para los otros dos.
+| Servicio | Comando |
+| :--- | :--- |
+| Autenticación | `git log 918ae87` |
+| Campus | `git log d4e4787` |
+| Eventos | `git log 9cc7db4` |
 
 ## Flujo Git
 
