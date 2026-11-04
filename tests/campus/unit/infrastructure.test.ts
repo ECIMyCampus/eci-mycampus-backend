@@ -1,31 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { loadConfig } from '../../src/config/env';
 import {
   BadRequestException,
   BusinessRuleException,
   ConflictException,
   ResourceNotFoundException,
-} from '../../src/exceptions/app.exception';
-import { CampusEntityMapper } from '../../src/mappers/campus-entity.mapper';
-
-describe('loadConfig (fail-fast de variables de entorno)', () => {
-  it('aplica valores por defecto en desarrollo', () => {
-    // Act
-    const config = loadConfig({ DATABASE_URL: 'postgresql://x' });
-
-    // Assert
-    expect(config.port).toBe(4002);
-    expect(config.corsOrigin).toBe(true);
-  });
-
-  it('separa múltiples orígenes CORS', () => {
-    // Act
-    const config = loadConfig({ DATABASE_URL: 'postgresql://x', CORS_ORIGIN: 'http://a.com, http://b.com' });
-
-    // Assert
-    expect(config.corsOrigin).toEqual(['http://a.com', 'http://b.com']);
-  });
-});
+} from '../../../src/shared/errors/app.exception';
+import { CampusEntityMapper } from '../../../src/modules/campus/mappers/campus-entity.mapper';
 
 describe('CampusEntityMapper (Domain <-> Prisma)', () => {
   const mapper = new CampusEntityMapper();

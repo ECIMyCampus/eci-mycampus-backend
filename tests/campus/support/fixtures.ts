@@ -1,7 +1,7 @@
-import { Building, CampusPlace, CampusService, type BuildingProps } from '../../src/models/domain/building';
-import { Faculty, type FacultyProps } from '../../src/models/domain/faculty';
-import { SportsFacility, type SportsFacilityProps } from '../../src/models/domain/sports';
-import type { ICampusRepository } from '../../src/repositories/campus.repository';
+import { Building, CampusPlace, CampusService, type BuildingProps } from '../../../src/modules/campus/models/domain/building';
+import { Faculty, type FacultyProps } from '../../../src/modules/campus/models/domain/faculty';
+import { SportsFacility, type SportsFacilityProps } from '../../../src/modules/campus/models/domain/sports';
+import type { ICampusRepository } from '../../../src/modules/campus/repositories/campus.repository';
 
 export function buildBuilding(overrides: Partial<BuildingProps> = {}): Building {
   const place = new CampusPlace({
