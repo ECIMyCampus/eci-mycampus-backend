@@ -17,7 +17,7 @@ export class EmailNotificationStrategy implements INotificationStrategy {
 }
 
 /**
- * Canal de respaldo mientras auth-service no exponga la consulta de correo por userId.
+ * Canal de respaldo mientras el módulo auth no exponga la consulta de correo por userId.
  * Deja trazabilidad estructurada de la notificación.
  */
 export class LogNotificationStrategy implements INotificationStrategy {
