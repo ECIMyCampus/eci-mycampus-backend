@@ -1,9 +1,10 @@
 import type { FastifyInstance } from 'fastify';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildApp } from '../../src/app';
-import type { AppConfig } from '../../src/config/env';
-import { CampusMapper } from '../../src/mappers/campus.mapper';
-import { CampusServiceImpl } from '../../src/services/impl/campus.service.impl';
+import { buildApp } from '../../../src/app';
+import { campusHttpModule } from '../../../src/modules/campus/module';
+import type { AppConfig } from '../../../src/config/env';
+import { CampusMapper } from '../../../src/modules/campus/mappers/campus.mapper';
+import { CampusServiceImpl } from '../../../src/modules/campus/services/impl/campus.service.impl';
 import {
   buildBuilding,
   buildFaculty,
@@ -15,7 +16,9 @@ const config: AppConfig = {
   nodeEnv: 'test',
   port: 0,
   databaseUrl: 'postgresql://unused',
+  jwtSecret: 'test_jwt_secret_with_sufficient_length_123',
   corsOrigin: true,
+  emailFrom: 'test@ecimycampus.dev',
 };
 
 describe('Campus API (Endpoints y Manejo de Errores)', () => {
@@ -28,8 +31,7 @@ describe('Campus API (Endpoints y Manejo de Errores)', () => {
     const mapper = new CampusMapper();
 
     app = await buildApp(config, () => ({
-      campusService: service,
-      campusMapper: mapper,
+      modules: [campusHttpModule({ campusService: service, campusMapper: mapper })],
       dispose: async () => {},
     }));
   });
@@ -44,7 +46,7 @@ describe('Campus API (Endpoints y Manejo de Errores)', () => {
 
     // Assert
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toMatchObject({ status: 'ok', service: 'campus-service' });
+    expect(res.json()).toMatchObject({ status: 'ok', service: 'eci-mycampus-backend' });
   });
 
   describe('GET /api/v1/campus/buildings', () => {

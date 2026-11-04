@@ -1,5 +1,6 @@
 import type { AppContainer } from './app';
 import type { AppConfig } from './config/env';
+import { createCampusModule } from './modules/campus';
 import { createPrismaClient } from './shared/database/prisma';
 import type { AppLogger } from './shared/utils/logger';
 
@@ -10,7 +11,7 @@ export function buildContainer(config: AppConfig, _logger: AppLogger): AppContai
   const prisma = createPrismaClient(config);
 
   return {
-    modules: [],
+    modules: [createCampusModule(prisma)],
     dispose: () => prisma.$disconnect(),
   };
 }

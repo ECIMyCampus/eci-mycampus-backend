@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ResourceNotFoundException } from '../../src/exceptions/app.exception';
-import { CampusServiceImpl } from '../../src/services/impl/campus.service.impl';
+import { ResourceNotFoundException } from '../../../src/shared/errors/app.exception';
+import { CampusServiceImpl } from '../../../src/modules/campus/services/impl/campus.service.impl';
 import {
   buildBuilding,
   buildFaculty,
