@@ -27,6 +27,7 @@ export type ContainerFactory = (logger: AppLogger) => AppContainer;
 export async function buildApp(config: AppConfig, containerFactory: ContainerFactory): Promise<FastifyInstance> {
   const app = Fastify({
     logger: config.nodeEnv === 'test' ? false : { level: config.nodeEnv === 'production' ? 'info' : 'debug' },
+    trustProxy: config.trustProxy ?? false,
   });
 
   app.setValidatorCompiler(validatorCompiler);
