@@ -10,6 +10,7 @@ const EnvSchema = z
     DATABASE_URL: z.string().min(1, 'DATABASE_URL es obligatoria'),
     JWT_SECRET: z.string({ error: 'JWT_SECRET es obligatorio' }).min(16),
     CORS_ORIGIN: z.string().optional(),
+    TRUST_PROXY: z.enum(['true', 'false']).default('false'),
     RESEND_API_KEY: z.string().optional(),
     EMAIL_FROM: z.string().default('ECI-MyCampus <no-reply@ecimycampus.dev>'),
   })
@@ -30,6 +31,8 @@ export interface AppConfig {
   databaseUrl: string;
   jwtSecret: string;
   corsOrigin: string[] | boolean;
+  /** Actívalo solo detrás de un proxy que controle X-Forwarded-For, como el ingress de Azure. */
+  trustProxy?: boolean;
   resendApiKey?: string;
   emailFrom: string;
 }
@@ -48,6 +51,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     databaseUrl: env.DATABASE_URL,
     jwtSecret: env.JWT_SECRET,
     corsOrigin: resolveCorsOrigin(env.CORS_ORIGIN, env.NODE_ENV),
+    trustProxy: env.TRUST_PROXY === 'true',
     resendApiKey: env.RESEND_API_KEY || undefined,
     emailFrom: env.EMAIL_FROM,
   };

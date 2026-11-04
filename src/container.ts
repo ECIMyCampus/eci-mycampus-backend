@@ -23,6 +23,9 @@ export function buildContainer(config: AppConfig, logger: AppLogger): AppContain
         emailFrom: config.emailFrom,
       }),
     ],
+    checkReadiness: async () => {
+      await prisma.$queryRaw`SELECT 1`;
+    },
     dispose: () => prisma.$disconnect(),
   };
 }

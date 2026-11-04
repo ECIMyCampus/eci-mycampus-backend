@@ -38,6 +38,7 @@ Solo `src/config/env.ts` las lee, y las valida al arrancar: si algo es inválido
 | `NODE_ENV` | No | `development` | `development`, `test` o `production` |
 | `PORT` | No | `4000` | Puerto HTTP |
 | `CORS_ORIGIN` | No | Ver abajo | Orígenes separados por coma |
+| `TRUST_PROXY` | No | `false` | `true` solo detrás de un proxy que controle `X-Forwarded-For`, como el ingress de Azure |
 | `RESEND_API_KEY` | No | | Sin clave, los correos solo se escriben en el log |
 | `EMAIL_FROM` | No | `ECI-MyCampus <no-reply@ecimycampus.dev>` | Remitente de correos |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` | No | | Solo para el seed. Las lee `prisma/seed.ts`, que no forma parte de la aplicación |
@@ -48,7 +49,7 @@ Sin `CORS_ORIGIN`, `NODE_ENV=development` o `test` reflejan el origen de la peti
 
 | Módulo | Método y ruta | Acceso |
 | :--- | :--- | :--- |
-| Sistema | `GET /health`, `GET /docs` | Público |
+| Sistema | `GET /health` (proceso vivo), `GET /health/ready` (base de datos disponible), `GET /docs` | Público |
 | Auth | `POST /api/v1/auth/register`, `POST /api/v1/auth/login` | Público |
 | Auth | `GET /api/v1/auth/me` | Autenticado |
 | Campus | `GET /api/v1/campus/buildings`, `/buildings/:id`, `/faculties`, `/sports` | Público |
