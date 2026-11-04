@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConflictException, ResourceNotFoundException, UnauthorizedException } from '../../../src/shared/errors/app.exception';
+import { UserProfile } from '../../../src/modules/auth/models/domain/user';
 import { AuthServiceImpl } from '../../../src/modules/auth/services/impl/auth.service.impl';
 import { AuthValidatorImpl } from '../../../src/modules/auth/validators/impl/auth.validator.impl';
 import { buildUser, InMemoryUserRepository, MockPasswordHasher } from '../support/fixtures';
@@ -9,25 +10,42 @@ describe('AuthServiceImpl', () => {
   let validator: AuthValidatorImpl;
   let hasher: MockPasswordHasher;
   let service: AuthServiceImpl;
+  const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+
+  const registrationFor = (email: string) => ({
+    email,
+    password: 'Secret123',
+    profile: new UserProfile({
+      fullName: 'Ana Pérez',
+      facultyId: null,
+      academicProgram: null,
+      interests: [],
+      avatarUrl: null,
+      isAuthorizedOrganizer: false,
+      habeasDataAcceptedAt: new Date(),
+    }),
+  });
 
   beforeEach(() => {
     repository = new InMemoryUserRepository();
     validator = new AuthValidatorImpl(repository);
     hasher = new MockPasswordHasher();
-    service = new AuthServiceImpl(repository, validator, hasher);
+    service = new AuthServiceImpl(repository, validator, hasher, logger);
   });
 
   describe('register', () => {
     it('registra un usuario nuevo y registra evento de auditoría', async () => {
       // Arrange
-      const user = buildUser({ id: undefined });
+      const registration = registrationFor('ana.perez@mail.escuelaing.edu.co');
 
       // Act
-      const created = await service.register(user);
+      const created = await service.register(registration);
 
       // Assert
       expect(created.id).toBeDefined();
-      expect(created.email).toBe(user.email);
+      expect(created.email).toBe(registration.email);
+      expect(created.role).toBe('ESTUDIANTE');
+      expect(created.passwordHash).toBe('hashed_Secret123');
       expect(repository.auditLogs).toHaveLength(1);
       expect(repository.auditLogs[0].action).toBe('USER_REGISTERED');
     });
@@ -38,7 +56,21 @@ describe('AuthServiceImpl', () => {
       repository.users.set(existing.id!, existing);
 
       // Act + Assert
-      await expect(service.register(existing)).rejects.toThrow(ConflictException);
+      const hash = vi.spyOn(hasher, 'hash');
+      await expect(service.register(registrationFor(existing.email))).rejects.toThrow(ConflictException);
+      expect(hash).not.toHaveBeenCalled();
+    });
+
+    it('un fallo de auditoría no interrumpe el registro y queda en el log', async () => {
+      // Arrange
+      vi.spyOn(repository, 'logAudit').mockRejectedValueOnce(new Error('sin conexión'));
+
+      // Act
+      const created = await service.register(registrationFor('b@mail.escuelaing.edu.co'));
+
+      // Assert
+      expect(created.id).toBeDefined();
+      expect(logger.error).toHaveBeenCalledOnce();
     });
   });
 

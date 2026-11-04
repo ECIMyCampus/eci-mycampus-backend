@@ -1,13 +1,14 @@
-import { User, UserProfile } from '../models/domain/user';
+import type { UserRegistration } from '../models/domain/types';
+import { UserProfile, type User } from '../models/domain/user';
 import type { RegisterRequestDTO } from '../models/dto/request/auth.request.dto';
 import type { UserResponseDTO } from '../models/dto/response/auth.response.dto';
 
 /**
  * Mapper de frontera HTTP (DTO <-> Domain).
- * Seguridad: rol por defecto ESTUDIANTE, activo por defecto true, id autogenerado.
+ * Lista blanca: solo los campos declarados llegan al dominio; rol y estado los fija el servicio.
  */
 export class AuthMapper {
-  toDomain(dto: RegisterRequestDTO, passwordHash: string): User {
+  toRegistration(dto: RegisterRequestDTO): UserRegistration {
     const profile = new UserProfile({
       fullName: dto.fullName,
       facultyId: dto.facultyId ?? null,
@@ -18,14 +19,7 @@ export class AuthMapper {
       habeasDataAcceptedAt: new Date(),
     });
 
-    return new User({
-      email: dto.email,
-      passwordHash,
-      role: 'ESTUDIANTE',
-      isActive: true,
-      isEmailVerified: false,
-      profile,
-    });
+    return { email: dto.email, password: dto.password, profile };
   }
 
   toResponse(user: User): UserResponseDTO {

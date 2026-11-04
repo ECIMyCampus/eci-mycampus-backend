@@ -1,6 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthMapper } from '../mappers/auth.mapper';
-import type { IPasswordHasher } from '../models/domain/types';
 import type { LoginRequestDTO, RegisterRequestDTO } from '../models/dto/request/auth.request.dto';
 import { currentActor } from '../../../shared/security/auth.guard';
 import type { JwtClaims } from '../../../shared/security/identity';
@@ -10,13 +9,10 @@ export class AuthController {
   constructor(
     private readonly authService: IAuthService,
     private readonly mapper: AuthMapper,
-    private readonly passwordHasher: IPasswordHasher,
   ) {}
 
   register = async (request: FastifyRequest<{ Body: RegisterRequestDTO }>, reply: FastifyReply) => {
-    const passwordHash = await this.passwordHasher.hash(request.body.password);
-    const draftUser = this.mapper.toDomain(request.body, passwordHash);
-    const created = await this.authService.register(draftUser);
+    const created = await this.authService.register(this.mapper.toRegistration(request.body));
 
     return reply.status(201).send({
       message: 'Usuario registrado exitosamente',

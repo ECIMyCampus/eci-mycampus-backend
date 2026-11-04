@@ -9,7 +9,7 @@ import { AuthValidatorImpl } from '../../src/modules/auth/validators/impl/auth.v
 import { eventsHttpModule } from '../../src/modules/events/module';
 import { EventsServiceImpl } from '../../src/modules/events/services/impl/events.service.impl';
 import { EventValidatorImpl } from '../../src/modules/events/validators/impl/event.validator.impl';
-import { InMemoryUserRepository, MockPasswordHasher } from '../auth/support/fixtures';
+import { InMemoryUserRepository, MockPasswordHasher, silentLogger } from '../auth/support/fixtures';
 import {
   InMemoryEventRepository,
   InMemoryRegistrationRepository,
@@ -39,9 +39,8 @@ describe('Contrato de identidad entre auth y events', () => {
     app = await buildApp(config, () => ({
       modules: [
         authHttpModule({
-          authService: new AuthServiceImpl(users, new AuthValidatorImpl(users), hasher),
+          authService: new AuthServiceImpl(users, new AuthValidatorImpl(users), hasher, silentLogger),
           authMapper: new AuthMapper(),
-          passwordHasher: hasher,
         }),
         eventsHttpModule(
           new EventsServiceImpl(
