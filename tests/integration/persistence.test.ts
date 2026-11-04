@@ -4,6 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../../src/app';
 import type { AppConfig } from '../../src/config/env';
 import { buildContainer } from '../../src/container';
+import { seedDatabase } from '../../prisma/seed';
 
 /**
  * Pruebas contra PostgreSQL real, con las migraciones ya aplicadas.
@@ -85,6 +86,29 @@ describe.skipIf(!databaseUrl)('Persistencia con PostgreSQL real', () => {
   afterAll(async () => {
     await app?.close();
     await prisma?.$disconnect();
+  });
+
+  it('el seed es idempotente y crea un administrador capaz de moderar', async () => {
+    const admin = { email: 'Admin@escuelaing.edu.co', password: 'contraseña-de-prueba' };
+
+    await seedDatabase(prisma, admin);
+    await seedDatabase(prisma, { ...admin, password: 'otra-contraseña-distinta' });
+
+    const buildings = await app.inject({ method: 'GET', url: '/api/v1/campus/buildings' });
+    const sports = await app.inject({ method: 'GET', url: '/api/v1/campus/sports' });
+    const faculties = await app.inject({ method: 'GET', url: '/api/v1/campus/faculties' });
+    expect(buildings.json()).toHaveLength(7);
+    expect(sports.json()).toHaveLength(2);
+    expect(faculties.json()).toHaveLength(6);
+    expect(await prisma.user.count({ where: { role: 'ADMIN' } })).toBe(1);
+
+    const login = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/login',
+      payload: { email: 'admin@escuelaing.edu.co', password: admin.password },
+    });
+    expect(login.statusCode).toBe(200);
+    expect(login.json().user.role).toBe('ADMIN');
   });
 
   it('registra, inicia sesión, guarda auditoría y normaliza el correo', async () => {
