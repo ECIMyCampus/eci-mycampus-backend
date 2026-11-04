@@ -1,0 +1,3 @@
+# Prisma Migrate lockfile v1
+# Read more: https://pris.ly/d/migration-lockfile
+provider = "postgresql"
