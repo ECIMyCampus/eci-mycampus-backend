@@ -22,3 +22,4 @@ export interface AuditLogEntry {
   payload?: Record<string, unknown>;
   ipAddress: string;
 }
+

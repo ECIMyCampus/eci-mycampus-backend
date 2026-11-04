@@ -4,3 +4,4 @@ export interface IAuthValidator {
   validateRegistration(email: string): Promise<void>;
   validateUserActive(user: User): void;
 }
+

@@ -59,3 +59,4 @@ export class BusinessRuleException extends AppException {
     super(message);
   }
 }
+

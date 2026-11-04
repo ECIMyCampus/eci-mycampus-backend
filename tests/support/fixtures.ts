@@ -76,3 +76,4 @@ export class InMemoryUserRepository implements IUserRepository {
     this.auditLogs.push(entry);
   }
 }
+

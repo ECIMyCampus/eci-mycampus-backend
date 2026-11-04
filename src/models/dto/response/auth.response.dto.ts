@@ -34,3 +34,4 @@ export type UserProfileResponseDTO = z.infer<typeof UserProfileResponseSchema>;
 export type UserResponseDTO = z.infer<typeof UserResponseSchema>;
 export type LoginResponseDTO = z.infer<typeof LoginResponseSchema>;
 export type RegisterResponseDTO = z.infer<typeof RegisterResponseSchema>;
+

@@ -33,3 +33,4 @@ export function buildErrorResponse(
     ...(detalles && detalles.length > 0 ? { detalles } : {}),
   });
 }
+

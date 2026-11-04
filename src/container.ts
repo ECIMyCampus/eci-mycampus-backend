@@ -33,3 +33,4 @@ export function buildContainer(config: AppConfig): AppContainer {
     dispose: () => prisma.$disconnect(),
   };
 }
+

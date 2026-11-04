@@ -45,3 +45,4 @@ export const RecoverPasswordRequestSchema = z
 export type RegisterRequestDTO = z.infer<typeof RegisterRequestSchema>;
 export type LoginRequestDTO = z.infer<typeof LoginRequestSchema>;
 export type RecoverPasswordRequestDTO = z.infer<typeof RecoverPasswordRequestSchema>;
+

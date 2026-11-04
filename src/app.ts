@@ -47,3 +47,4 @@ export async function buildApp(config: AppConfig, containerFactory: ContainerFac
 
   return app;
 }
+

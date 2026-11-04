@@ -64,3 +64,4 @@ function toErrorResponse(error: FastifyError, request: FastifyRequest): ErrorRes
   // Fallback 500
   return buildErrorResponse(500, 'Internal Server Error', 'Ocurrió un error inesperado.', path);
 }
+

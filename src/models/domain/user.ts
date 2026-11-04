@@ -80,3 +80,4 @@ export class User {
     return this.profile?.isAuthorizedOrganizer ?? false;
   }
 }
+
