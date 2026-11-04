@@ -14,7 +14,7 @@ Registro de decisiones importantes. Para cambiar una, se agrega una entrada nuev
 
 ## ADR-002: dos repositorios, backend y frontend
 
-- **Estado:** aceptada por el equipo.
+- **Estado:** aceptada por el equipo. ADR-011 actualiza sus consecuencias.
 - **Contexto:** había cuatro repos. Los tres servicios ya forman un solo sistema, mientras que el frontend tiene otro ciclo de trabajo y otra persona responsable de buena parte de su historial.
 - **Decisión:** `eci-mycampus-backend` es un repo nuevo con el monolito, que importa el historial de los tres servicios mediante `git subtree` sin squash. `eci-mycampus-web` se conserva como repo del frontend. Cada repo tiene sus ramas `main` y `develop`.
 - **Alternativas:**
@@ -94,4 +94,15 @@ Registro de decisiones importantes. Para cambiar una, se agrega una entrada nuev
 - **Decisión:** un comando, `npm run prisma:seed`. El administrador solo se crea si se definen sus variables, y nunca cambia una cuenta existente.
 - **Alternativas:** sembrar al iniciar el proceso. Es cómodo en local, pero con varias réplicas compite y en producción puede reinsertar datos de demostración sin que nadie lo pida.
 - **Consecuencias:** hay que ejecutarlo a mano. El catálogo es de demostración y debe sustituirse por datos oficiales.
+
+## ADR-011: retiro de los repositorios de servicios
+
+- **Estado:** aceptada; aplicada por el equipo.
+- **Contexto:** `eci-mycampus-auth-service`, `eci-mycampus-campus-service` y `eci-mycampus-events-service` quedaron sin uso al consolidarse en este repo. `demo-repository` era la plantilla de ejemplo de GitHub, ajena al proyecto.
+- **Decisión:** retirarlos de la organización. Quedan `eci-mycampus-backend` y `eci-mycampus-web`.
+- **Alternativas:** archivarlos. Conservaría sus URL, pero mantendría a la vista repos que ya no se deben usar.
+- **Consecuencias:**
+  - Este repo es la única fuente del código de los servicios. Su historial, con los autores originales, se consulta con `git log -- services/<nombre>-service`.
+  - Los PR, issues y ajustes de esos repos no se conservan. No tenían PR ni issues al revisarlos.
+  - Los enlaces antiguos a esos repos dejan de funcionar.
 
