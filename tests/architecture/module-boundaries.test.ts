@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, posix, relative, sep } from 'node:path';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -7,7 +8,8 @@ import { describe, expect, it } from 'vitest';
  * shared no conoce a los módulos y el dominio no conoce infraestructura.
  */
 const SRC = join(__dirname, '..', '..', 'src');
-const FORBIDDEN_IN_DOMAIN = ['fastify', '@prisma/client', 'zod'];
+const FORBIDDEN_IN_DOMAIN = /^(fastify($|[-/])|@fastify\/|@prisma\/|prisma$|zod($|\/))/;
+const FORBIDDEN_TARGETS_IN_DOMAIN = /(^|\/)repositories(\/|$)|^shared\/database(\/|$)|^config(\/|$)/;
 
 function listSources(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -17,24 +19,32 @@ function listSources(dir: string): string[] {
 }
 
 function importsOf(source: string): string[] {
-  return [...source.matchAll(/(?:from|import)\s+'([^']+)'/g)].map((match) => match[1]!);
+  return ts.preProcessFile(source, true, true).importedFiles.map((file) => file.fileName);
 }
 
 /** Devuelve la violación de una importación o null. `file` y el resultado son relativos a src/. */
 function checkImport(file: string, specifier: string): string | null {
   const ownModule = /^modules\/([^/]+)\//.exec(file)?.[1];
+  const isDomain = /^modules\/[^/]+\/models\/domain\//.test(file);
 
   if (!specifier.startsWith('.')) {
-    const isDomain = /^modules\/[^/]+\/models\/domain\//.test(file);
-    return isDomain && FORBIDDEN_IN_DOMAIN.includes(specifier)
+    return isDomain && FORBIDDEN_IN_DOMAIN.test(specifier)
       ? `${file}: el dominio no puede importar ${specifier}`
       : null;
   }
 
   const target = posix.normalize(posix.join(posix.dirname(file), specifier));
 
-  if (file.startsWith('shared/') && target.startsWith('modules/')) {
-    return `${file}: shared no puede importar módulos (${target})`;
+  if (isDomain && FORBIDDEN_TARGETS_IN_DOMAIN.test(target)) {
+    return `${file}: el dominio no puede importar infraestructura (${target})`;
+  }
+
+  if (file.startsWith('shared/') && /^(modules(\/|$)|app$|container$)/.test(target)) {
+    return `${file}: shared no puede importar módulos ni la aplicación (${target})`;
+  }
+
+  if (ownModule && /^config(\/|$)/.test(target)) {
+    return `${file}: un módulo recibe su configuración por constructor (${target})`;
   }
 
   const targetModule = /^modules\/([^/]+)(?:\/|$)/.exec(target)?.[1];
@@ -75,12 +85,33 @@ describe('Límites entre módulos', () => {
       ['modules/events/services/a.ts', '../../auth/services/auth.service'],
       ['modules/events/a.ts', '../campus/repositories/campus.repository'],
       ['shared/errors/a.ts', '../../modules/auth'],
+      ['shared/errors/a.ts', '../../modules'],
+      ['shared/errors/a.ts', '../../container'],
+      ['modules/auth/a.ts', '../../config/env'],
+      ['modules/auth/models/domain/a.ts', 'fastify-plugin'],
+      ['modules/auth/models/domain/a.ts', 'zod/v4'],
+      ['modules/auth/models/domain/a.ts', '../../repositories/prisma/x'],
+      ['modules/auth/models/domain/a.ts', '../../../../shared/database/prisma'],
       ['modules/auth/a.ts', '../../container'],
       ['modules/auth/models/domain/a.ts', 'fastify'],
       ['modules/events/models/domain/state/a.ts', '@prisma/client'],
     ])('%s -> %s', (file, specifier) => {
       expect(checkImport(file, specifier)).not.toBeNull();
     });
+  });
+
+  it.each([
+    ['import a from "../../auth/services/x";'],
+    ["export { b } from '../../auth/services/x';"],
+    ["const c = require('../../auth/services/x');"],
+    ["const d = await import('../../auth/services/x');"],
+    ["import {\n  e,\n} from '../../auth/services/x';"],
+  ])('reconoce la forma de importación: %s', (source) => {
+    expect(importsOf(source)).toEqual(['../../auth/services/x']);
+  });
+
+  it('no confunde comentarios con importaciones', () => {
+    expect(importsOf("// import x from '../../auth/services/x';\n")).toEqual([]);
   });
 
   describe('permite importaciones legales', () => {
@@ -90,6 +121,7 @@ describe('Límites entre módulos', () => {
       ['modules/events/services/a.ts', '../models/domain/event'],
       ['modules/events/a.ts', '../../shared/errors/app.exception'],
       ['modules/auth/models/domain/enums.ts', '../../../../shared/security/identity'],
+      ['modules/events/models/domain/state/a.ts', '../../../../../shared/errors/app.exception'],
       ['modules/auth/controllers/a.ts', 'fastify'],
       ['container.ts', './modules/auth'],
     ])('%s -> %s', (file, specifier) => {

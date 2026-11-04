@@ -34,14 +34,14 @@ Solo `src/config/env.ts` las lee, y las valida al arrancar: si algo es inválido
 | Variable | Obligatoria | Por defecto | Descripción |
 | :--- | :--- | :--- | :--- |
 | `DATABASE_URL` | Sí | | Conexión a PostgreSQL. Los esquemas están en `prisma/schema` |
-| `JWT_SECRET` | Sí | | Mínimo 16 caracteres. Producción rechaza el valor de `.env.example` |
+| `JWT_SECRET` | Sí | | Mínimo 16 caracteres. El valor de `.env.example` solo se acepta con `NODE_ENV=development` o `test` |
 | `NODE_ENV` | No | `development` | `development`, `test` o `production` |
 | `PORT` | No | `4000` | Puerto HTTP |
 | `CORS_ORIGIN` | No | Ver abajo | Orígenes separados por coma |
 | `RESEND_API_KEY` | No | | Sin clave, los correos solo se escriben en el log |
 | `EMAIL_FROM` | No | `ECI-MyCampus <no-reply@ecimycampus.dev>` | Remitente de correos |
 
-Sin `CORS_ORIGIN`, desarrollo refleja el origen de la petición y producción no habilita CORS. La web llega por rewrites del mismo origen y las apps móviles nativas no están sujetas a CORS, así que solo hace falta definirla si un navegador llama a la API desde otro dominio.
+Sin `CORS_ORIGIN`, `NODE_ENV=development` o `test` reflejan el origen de la petición; cualquier otro caso no habilita CORS. La web llega por rewrites del mismo origen y las apps móviles nativas no están sujetas a CORS, así que solo hace falta definirla si un navegador llama a la API desde otro dominio.
 
 ## API
 
@@ -136,7 +136,7 @@ TEST_DATABASE_URL=postgresql://postgres:postgrespassword@localhost:5432/ecimycam
 JWT_SECRET=<secreto-de-produccion> docker compose up --build
 ```
 
-Compose levanta PostgreSQL, aplica migraciones y arranca el backend en el puerto 4000.
+Compose levanta PostgreSQL, aplica migraciones y arranca el backend en el puerto 4000. PostgreSQL solo escucha en `127.0.0.1`. Fuera de tu máquina, define también `POSTGRES_PASSWORD`. Si falta `JWT_SECRET`, el backend no arranca.
 
 ## Flujo Git
 

@@ -20,7 +20,7 @@ export const RegisterRequestSchema = z
       .regex(/[A-Z]/, 'La contraseña debe contener al menos una letra mayúscula')
       .regex(/[0-9]/, 'La contraseña debe contener al menos un número'),
     fullName: z.string().trim().min(3, 'El nombre completo debe tener al menos 3 caracteres').max(100),
-    facultyId: z.string().uuid('Identificador de facultad no válido').optional(),
+    facultyId: z.guid('Identificador de facultad no válido').optional(),
     academicProgram: z.string().trim().max(100).optional(),
     interests: z.array(z.string().trim().max(50)).default([]),
     habeasDataAccepted: z.literal(true, {
