@@ -76,3 +76,22 @@ Registro de decisiones importantes. Para cambiar una, se agrega una entrada nuev
   - El JWT Bearer ya es adecuado; CORS no afecta a clientes nativos.
   - Sube la prioridad de verificar correos, limitar intentos y renovar tokens (H-02, H-03, M-02), pues la API queda expuesta directamente y los tokens viven en dispositivos.
   - Cambiar el contrato afectará a apps ya instaladas que no se actualizan de inmediato: los cambios incompatibles deben ir en una versión nueva de la ruta (`/api/v2`).
+
+## ADR-009: Azure Container Apps como destino de despliegue
+
+- **Estado:** propuesta; aún no se ha desplegado.
+- **Contexto:** el equipo desplegará en Azure, sin Firebase, y dos personas deben poder operarlo.
+- **Decisión:** backend y web en Azure Container Apps, base en PostgreSQL Flexible Server, imágenes en Container Registry. Las migraciones corren en un job antes de actualizar el backend.
+- **Alternativas:**
+  - *App Service:* válido, pero sin un mecanismo tan directo para ejecutar migraciones como job.
+  - *AKS:* demasiada operación para un solo despliegue y dos personas.
+- **Consecuencias:** las imágenes ya sirven para cualquier servicio de contenedores, así que cambiar de opción no toca el código. La URL del backend en la web se fija al construir la imagen.
+
+## ADR-010: seed explícito, no automático al arrancar
+
+- **Estado:** aceptada.
+- **Contexto:** la guía del equipo pide datos de arranque idempotentes, y sin ellos no había forma de obtener un administrador.
+- **Decisión:** un comando, `npm run prisma:seed`. El administrador solo se crea si se definen sus variables, y nunca cambia una cuenta existente.
+- **Alternativas:** sembrar al iniciar el proceso. Es cómodo en local, pero con varias réplicas compite y en producción puede reinsertar datos de demostración sin que nadie lo pida.
+- **Consecuencias:** hay que ejecutarlo a mano. El catálogo es de demostración y debe sustituirse por datos oficiales.
+

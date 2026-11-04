@@ -154,3 +154,31 @@ eci-mycampus-backend/
 ├── package.json, package-lock.json, tsconfig.json, tsconfig.test.json, vitest.config.ts
 └── README.md
 ```
+
+## Actualización: revisión de consolidación
+
+**Fecha:** 2026-11-04. Trabajo local, sin push.
+
+**Inventario real de ECIMyCampus.** No hay seis microservicios: hay seis repositorios, de los cuales tres son servicios ya consolidados aquí.
+
+| Repo | Qué es | Ramas remotas | Estado |
+| :--- | :--- | :--- | :--- |
+| `eci-mycampus-auth-service` | Servicio | `main` | Integrado con todo su historial |
+| `eci-mycampus-campus-service` | Servicio | `main` | Integrado con todo su historial |
+| `eci-mycampus-events-service` | Servicio | `main` | Integrado con todo su historial |
+| `eci-mycampus-backend` | Monolito | `develop` | Repo vigente |
+| `eci-mycampus-web` | Frontend | `main`, `develop` | Repo vigente |
+| `demo-repository` | Plantilla de ejemplo de GitHub | `main`, `add-badges-to-readme` | Ajeno al proyecto; no se integra |
+
+Ninguna rama local o remota de los repos vigentes queda sin integrar en `develop`, y no hay PR ni issues en la organización.
+
+**Cambios:** ver `GUIDE_COMPLIANCE.md` y las decisiones ADR-009 y ADR-010. Además, H-07 y H-09 quedan cubiertos en parte: hay seed y administrador inicial, pero sigue sin haber gestión de roles por API.
+
+**Pruebas tras esta revisión:**
+
+- Backend: 172 de 172 con PostgreSQL embebido, cobertura de líneas de 97,42 %, build correcto y `npm audit --omit=dev` en 0.
+- Web: 4 de 4, build `standalone` correcto.
+- E2E con backend en producción y servidor `standalone`: catálogo sembrado, registro, login, creación de evento, 403 a estudiante, aprobación con el administrador del seed, inscripción y 409 sin cupo.
+
+**Sin verificar:** las imágenes Docker y la guía de Azure. El CI construye y prueba las imágenes, pero solo correrá cuando se suban estos cambios.
+

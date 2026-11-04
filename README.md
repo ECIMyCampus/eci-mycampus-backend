@@ -5,6 +5,8 @@ Monolito modular de ECI-MyCampus: identidad, catálogo del campus y eventos, en 
 - **Stack:** Node.js 22, TypeScript estricto, Fastify 5, Zod 4, Prisma 6, PostgreSQL 16.
 - **Arquitectura:** [`docs/architecture/MODULAR_MONOLITH.md`](docs/architecture/MODULAR_MONOLITH.md)
 - **Decisiones:** [`docs/architecture/ARCHITECTURE_DECISIONS.md`](docs/architecture/ARCHITECTURE_DECISIONS.md)
+- **Cumplimiento de la guía de backend:** [`docs/architecture/GUIDE_COMPLIANCE.md`](docs/architecture/GUIDE_COMPLIANCE.md)
+- **Despliegue en Azure:** [`docs/deployment/AZURE.md`](docs/deployment/AZURE.md)
 - **Auditoría inicial:** [`docs/audit/PROJECT_AUDIT.md`](docs/audit/PROJECT_AUDIT.md)
 - **Cliente web:** repo `eci-mycampus-web`.
 
@@ -60,6 +62,8 @@ Sin `CORS_ORIGIN`, `NODE_ENV=development` o `test` reflejan el origen de la peti
 | Events | `PATCH /api/v1/events/:id/cancel` | Organizador o moderación |
 | Events | `POST /api/v1/events/:id/register`, `/reports` | Autenticado |
 
+En Azure, usa `/health` para la sonda de liveness y `/health/ready` para la de readiness.
+
 La autenticación usa `Authorization: Bearer <token>`, con el token que devuelve `/login` (vigencia de 7 días).
 
 Todo error responde con el mismo formato:
@@ -92,6 +96,7 @@ Cualquier otra transición responde `422`. `REUBICACION_LOGISTICA_PENDIENTE` y `
 ```text
 ├── .github/workflows/ci.yml
 ├── docs/                  # Auditoría, arquitectura y decisiones
+├── prisma/seed.ts         # Datos de arranque idempotentes
 ├── prisma/schema/         # base.prisma, un archivo por módulo y migrations/
 ├── src/
 │   ├── app.ts             # Plugins transversales y registro de módulos
