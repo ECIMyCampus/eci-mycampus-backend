@@ -7,7 +7,7 @@ import type {
   EventReportCreationRequestDTO,
   RadarFilterRequestDTO,
 } from '../models/dto/request/event.request.dto';
-import { currentActor } from '../security/auth.guard';
+import { currentActor } from '../../../shared/security/auth.guard';
 import type { IEventsService } from '../services/events.service';
 
 type WithParams = { Params: EventIdParamsDTO };

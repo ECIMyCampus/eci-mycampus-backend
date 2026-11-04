@@ -1,4 +1,4 @@
-import { ConflictException, ResourceNotFoundException } from '../../exceptions/app.exception';
+import { ConflictException, ResourceNotFoundException } from '../../../../shared/errors/app.exception';
 import type { IDomainEventPublisher } from '../../listeners/domain-event-publisher';
 import type { Event } from '../../models/domain/event';
 import type { Actor, EventReport, EventWithStats, RadarCriteria, Registration } from '../../models/domain/types';

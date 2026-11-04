@@ -1,4 +1,4 @@
-import type { AppLogger } from '../../utils/logger';
+import type { AppLogger } from '../../../../shared/utils/logger';
 import type { EmailMessage, IEmailAdapter } from '../email.adapter';
 
 /** Adaptador determinista para desarrollo local y pruebas: solo registra el correo. */

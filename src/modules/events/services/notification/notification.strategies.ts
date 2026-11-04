@@ -1,5 +1,5 @@
 import type { IEmailAdapter } from '../../adapters/email.adapter';
-import type { AppLogger } from '../../utils/logger';
+import type { AppLogger } from '../../../../shared/utils/logger';
 import type { INotificationStrategy, Notification } from './notification.strategy';
 
 export class EmailNotificationStrategy implements INotificationStrategy {

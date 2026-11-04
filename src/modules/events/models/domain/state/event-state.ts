@@ -1,6 +1,6 @@
 import type { Event } from '../event';
 import type { EventStatus } from '../enums';
-import { InvalidStateException } from '../../../exceptions/app.exception';
+import { InvalidStateException } from '../../../../../shared/errors/app.exception';
 
 /**
  * Contrato del patrón State para el ciclo de vida de un evento.

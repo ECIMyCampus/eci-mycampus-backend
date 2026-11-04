@@ -1,5 +1,5 @@
 import type { DomainEvent } from '../models/domain/events/domain-events';
-import type { AppLogger } from '../utils/logger';
+import type { AppLogger } from '../../../shared/utils/logger';
 
 export type DomainEventHandler = (event: DomainEvent) => Promise<void> | void;
 

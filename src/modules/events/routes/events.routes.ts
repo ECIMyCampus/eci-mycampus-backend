@@ -9,7 +9,7 @@ import type {
   EventReportCreationRequestDTO,
   RadarFilterRequestDTO,
 } from '../models/dto/request/event.request.dto';
-import { requireAuth, requireRoles } from '../security/auth.guard';
+import { requireAuth, requireRoles } from '../../../shared/security/auth.guard';
 
 const ORGANIZER_ROLES = ['ESTUDIANTE', 'DOCENTE', 'ENTRENADOR', 'MODERADOR', 'ADMIN'] as const;
 const MODERATION_ROLES = ['MODERADOR', 'ADMIN'] as const;

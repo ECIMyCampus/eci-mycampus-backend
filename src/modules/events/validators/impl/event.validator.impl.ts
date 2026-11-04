@@ -2,7 +2,7 @@ import {
   BusinessRuleException,
   ConflictException,
   ForbiddenException,
-} from '../../exceptions/app.exception';
+} from '../../../../shared/errors/app.exception';
 import type { Event } from '../../models/domain/event';
 import type { UserRole } from '../../models/domain/enums';
 import type { Actor } from '../../models/domain/types';

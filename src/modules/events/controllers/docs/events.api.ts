@@ -12,7 +12,7 @@ import {
   RadarEventResponseSchema,
   RegistrationResponseSchema,
 } from '../../models/dto/response/event.response.dto';
-import { ErrorResponseSchema } from '../../models/dto/response/error.response.dto';
+import { ErrorResponseSchema } from '../../../../shared/errors/error.response.dto';
 
 /**
  * Contrato documental de la API (equivalente a las interfaces `*Api` con OpenAPI).
