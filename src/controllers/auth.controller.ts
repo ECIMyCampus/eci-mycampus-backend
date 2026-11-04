@@ -40,6 +40,7 @@ export class AuthController {
         {
           id: user.id,
           email: user.email,
+          fullName: user.fullName,
           role: user.role,
           facultyId: user.facultyId,
           isAuthorizedOrganizer: user.isAuthorizedOrganizer,
