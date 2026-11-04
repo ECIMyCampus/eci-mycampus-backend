@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
       POSTGRES_DB: ecimycampus_db
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
@@ -33,9 +33,11 @@ services:
     environment:
       PORT: 4000
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgrespassword}@db:5432/ecimycampus_db
-      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET}
+      # Si falta, el backend no arranca: src/config/env.ts lo valida.
+      JWT_SECRET: ${JWT_SECRET:-}
       CORS_ORIGIN: ${CORS_ORIGIN:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-ECI-MyCampus <no-reply@ecimycampus.dev>}
     ports:
       - '4000:4000'
     depends_on:
