@@ -42,7 +42,7 @@ model UserProfile {
 
 model AuditLog {
   id           String   @id @default(uuid())
-  actorId      String   @map("actor_id")
+  actorId      String?  @map("actor_id")
   action       String
   targetEntity String   @map("target_entity")
   targetId     String   @map("target_id")
