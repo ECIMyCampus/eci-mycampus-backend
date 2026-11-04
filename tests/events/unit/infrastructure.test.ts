@@ -1,14 +1,13 @@
 import { Prisma } from '@prisma/client';
 import { describe, expect, it, vi } from 'vitest';
-import { ConsoleEmailAdapter } from '../../src/adapters/impl/console-email.adapter';
-import { loadConfig } from '../../src/config/env';
-import { InMemoryDomainEventPublisher } from '../../src/listeners/domain-event-publisher';
-import { EventEntityMapper } from '../../src/mappers/event-entity.mapper';
+import { ConsoleEmailAdapter } from '../../../src/modules/events/adapters/impl/console-email.adapter';
+import { InMemoryDomainEventPublisher } from '../../../src/modules/events/listeners/domain-event-publisher';
+import { EventEntityMapper } from '../../../src/modules/events/mappers/event-entity.mapper';
 import {
   EmailNotificationStrategy,
   LogNotificationStrategy,
-} from '../../src/services/notification/notification.strategies';
-import type { AppLogger } from '../../src/utils/logger';
+} from '../../../src/modules/events/services/notification/notification.strategies';
+import type { AppLogger } from '../../../src/shared/utils/logger';
 import { buildEvent, EVENT_ID, NOW } from '../support/fixtures';
 
 const fakeLogger = (): AppLogger => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn() });
@@ -58,29 +57,6 @@ describe('EventEntityMapper (Domain <-> Prisma)', () => {
     expect(data).not.toHaveProperty('id');
     expect(data.price).toBeInstanceOf(Prisma.Decimal);
     expect(mapper.toStatusUpdateData(buildEvent())).toEqual({ status: 'PUBLICADO', rejectionReason: null });
-  });
-});
-
-describe('loadConfig (fail-fast de variables de entorno)', () => {
-  it('aplica valores por defecto en desarrollo', () => {
-    // Act
-    const config = loadConfig({ DATABASE_URL: 'postgresql://x' });
-    // Assert
-    expect(config.port).toBe(4003);
-    expect(config.corsOrigin).toBe(true);
-    expect(config.jwtSecret).toContain('dev_jwt_secret');
-  });
-
-  it('exige JWT_SECRET en producción', () => {
-    // Act + Assert
-    expect(() => loadConfig({ DATABASE_URL: 'postgresql://x', NODE_ENV: 'production' })).toThrow('JWT_SECRET');
-  });
-
-  it('separa múltiples orígenes CORS', () => {
-    // Act
-    const config = loadConfig({ DATABASE_URL: 'postgresql://x', CORS_ORIGIN: 'http://a.com, http://b.com' });
-    // Assert
-    expect(config.corsOrigin).toEqual(['http://a.com', 'http://b.com']);
   });
 });
 

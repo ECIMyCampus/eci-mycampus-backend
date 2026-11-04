@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { EventNotificationListener } from '../../src/listeners/event-notification.listener';
-import { EventSpecs } from '../../src/repositories/spec/event.specs';
-import type { INotificationStrategy } from '../../src/services/notification/notification.strategy';
-import { NotificationStrategyFactory } from '../../src/services/notification/notification-strategy.factory';
+import { EventNotificationListener } from '../../../src/modules/events/listeners/event-notification.listener';
+import { EventSpecs } from '../../../src/modules/events/repositories/spec/event.specs';
+import type { INotificationStrategy } from '../../../src/modules/events/services/notification/notification.strategy';
+import { NotificationStrategyFactory } from '../../../src/modules/events/services/notification/notification-strategy.factory';
 import { NOW } from '../support/fixtures';
 
 describe('EventSpecs (Specification sobre Prisma)', () => {

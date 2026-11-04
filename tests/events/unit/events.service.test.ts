@@ -3,9 +3,9 @@ import {
   ConflictException,
   InvalidStateException,
   ResourceNotFoundException,
-} from '../../src/exceptions/app.exception';
-import { EventsServiceImpl } from '../../src/services/impl/events.service.impl';
-import { EventValidatorImpl } from '../../src/validators/impl/event.validator.impl';
+} from '../../../src/shared/errors/app.exception';
+import { EventsServiceImpl } from '../../../src/modules/events/services/impl/events.service.impl';
+import { EventValidatorImpl } from '../../../src/modules/events/validators/impl/event.validator.impl';
 import {
   buildActor,
   buildEvent,

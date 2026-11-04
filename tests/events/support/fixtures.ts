@@ -1,12 +1,12 @@
-import { Event, type EventProps } from '../../src/models/domain/event';
-import type { Actor, EventReport, EventWithStats, RadarCriteria, Registration } from '../../src/models/domain/types';
+import { Event, type EventProps } from '../../../src/modules/events/models/domain/event';
+import type { Actor, EventReport, EventWithStats, RadarCriteria, Registration } from '../../../src/modules/events/models/domain/types';
 import type {
   IEventReportRepository,
   IEventRepository,
   IRegistrationRepository,
-} from '../../src/repositories/event.repository';
-import type { IDomainEventPublisher } from '../../src/listeners/domain-event-publisher';
-import type { DomainEvent } from '../../src/models/domain/events/domain-events';
+} from '../../../src/modules/events/repositories/event.repository';
+import type { IDomainEventPublisher } from '../../../src/modules/events/listeners/domain-event-publisher';
+import type { DomainEvent } from '../../../src/modules/events/models/domain/events/domain-events';
 
 export const NOW = new Date('2026-11-10T15:00:00.000Z');
 export const EVENT_ID = '11111111-1111-4111-8111-111111111111';

@@ -1,10 +1,11 @@
 import type { FastifyInstance } from 'fastify';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildApp } from '../../src/app';
-import type { AppConfig } from '../../src/config/env';
-import type { UserRole } from '../../src/models/domain/enums';
-import { EventsServiceImpl } from '../../src/services/impl/events.service.impl';
-import { EventValidatorImpl } from '../../src/validators/impl/event.validator.impl';
+import { buildApp } from '../../../src/app';
+import { eventsHttpModule } from '../../../src/modules/events/module';
+import type { AppConfig } from '../../../src/config/env';
+import type { UserRole } from '../../../src/modules/events/models/domain/enums';
+import { EventsServiceImpl } from '../../../src/modules/events/services/impl/events.service.impl';
+import { EventValidatorImpl } from '../../../src/modules/events/validators/impl/event.validator.impl';
 import {
   buildEvent,
   EVENT_ID,
@@ -56,7 +57,7 @@ describe('Events API (rutas + guards + GlobalErrorHandler)', () => {
       new RecordingPublisher(),
       () => NOW,
     );
-    app = await buildApp(config, () => ({ eventsService: service, dispose: async () => {} }));
+    app = await buildApp(config, () => ({ modules: [eventsHttpModule(service)], dispose: async () => {} }));
   });
 
   afterEach(async () => {

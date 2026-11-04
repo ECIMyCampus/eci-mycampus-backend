@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { InvalidStateException } from '../../src/exceptions/app.exception';
+import { InvalidStateException } from '../../../src/shared/errors/app.exception';
 import { buildEvent, NOW } from '../support/fixtures';
 
 describe('Event · máquina de estados (State Deny-by-Default)', () => {

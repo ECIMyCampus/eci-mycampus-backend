@@ -3,8 +3,8 @@ import {
   BusinessRuleException,
   ConflictException,
   ForbiddenException,
-} from '../../src/exceptions/app.exception';
-import { EventValidatorImpl } from '../../src/validators/impl/event.validator.impl';
+} from '../../../src/shared/errors/app.exception';
+import { EventValidatorImpl } from '../../../src/modules/events/validators/impl/event.validator.impl';
 import {
   buildActor,
   buildEvent,
