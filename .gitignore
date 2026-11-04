@@ -1,0 +1,26 @@
+# Dependencias y artefactos
+node_modules/
+dist/
+build/
+coverage/
+out/
+*.tsbuildinfo
+
+# Secretos: nunca se versionan
+.env
+.env.*
+*.env
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+serviceAccount*.json*
+
+# Logs y sistema
+logs/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
