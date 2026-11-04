@@ -1,52 +1,34 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { campusService } from '../services/campus.service';
-import { buildingParamsSchema } from '../schemas/campus.schema';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { CampusMapper } from '../mappers/campus.mapper';
+import type { BuildingParamsDTO } from '../models/dto/request/campus.request.dto';
+import type { ICampusService } from '../services/campus.service';
 
 export class CampusController {
-  async getBuildings(request: FastifyRequest, reply: FastifyReply) {
-    try {
-      const buildings = await campusService.getBuildings();
-      return reply.status(200).send(buildings);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al obtener edificios';
-      return reply.status(500).send({ error: 'Internal Server Error', message });
-    }
-  }
+  constructor(
+    private readonly campusService: ICampusService,
+    private readonly mapper: CampusMapper,
+  ) {}
 
-  async getBuildingById(request: FastifyRequest, reply: FastifyReply) {
-    const parseResult = buildingParamsSchema.safeParse(request.params);
-    if (!parseResult.success) {
-      return reply.status(400).send({ error: 'Bad Request', message: 'ID de edificio no válido' });
-    }
+  getBuildings = async (_request: FastifyRequest, reply: FastifyReply) => {
+    const buildings = await this.campusService.getBuildings();
+    return reply.status(200).send(buildings.map((b) => this.mapper.toBuildingResponse(b)));
+  };
 
-    try {
-      const building = await campusService.getBuildingById(parseResult.data.id);
-      return reply.status(200).send(building);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Edificio no encontrado';
-      return reply.status(404).send({ error: 'Not Found', message });
-    }
-  }
+  getBuildingById = async (
+    request: FastifyRequest<{ Params: BuildingParamsDTO }>,
+    reply: FastifyReply,
+  ) => {
+    const building = await this.campusService.getBuildingById(request.params.id);
+    return reply.status(200).send(this.mapper.toBuildingResponse(building));
+  };
 
-  async getFaculties(request: FastifyRequest, reply: FastifyReply) {
-    try {
-      const faculties = await campusService.getFaculties();
-      return reply.status(200).send(faculties);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al obtener facultades';
-      return reply.status(500).send({ error: 'Internal Server Error', message });
-    }
-  }
+  getFaculties = async (_request: FastifyRequest, reply: FastifyReply) => {
+    const faculties = await this.campusService.getFaculties();
+    return reply.status(200).send(faculties.map((f) => this.mapper.toFacultyResponse(f)));
+  };
 
-  async getSportsFacilities(request: FastifyRequest, reply: FastifyReply) {
-    try {
-      const facilities = await campusService.getSportsFacilities();
-      return reply.status(200).send(facilities);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al obtener escenarios deportivos';
-      return reply.status(500).send({ error: 'Internal Server Error', message });
-    }
-  }
+  getSportsFacilities = async (_request: FastifyRequest, reply: FastifyReply) => {
+    const facilities = await this.campusService.getSportsFacilities();
+    return reply.status(200).send(facilities.map((s) => this.mapper.toSportsResponse(s)));
+  };
 }
-
-export const campusController = new CampusController();

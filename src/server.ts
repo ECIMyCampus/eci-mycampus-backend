@@ -1,38 +1,26 @@
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
-import dotenv from 'dotenv';
-import { campusRoutes } from './routes/campus.routes';
+import 'dotenv/config';
+import { buildApp } from './app';
+import { loadConfig } from './config/env';
+import { buildContainer } from './container';
 
-dotenv.config();
+async function start(): Promise<void> {
+  const config = loadConfig();
+  const app = await buildApp(config, () => buildContainer(config));
 
-const server = Fastify({
-  logger: {
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  },
-});
+  const shutdown = async (signal: string) => {
+    app.log.info({ signal }, 'Cerrando campus-service...');
+    await app.close();
+    process.exit(0);
+  };
+  process.once('SIGINT', () => void shutdown('SIGINT'));
+  process.once('SIGTERM', () => void shutdown('SIGTERM'));
 
-server.register(cors, {
-  origin: process.env.CORS_ORIGIN || true,
-  credentials: true,
-});
-
-// Health check
-server.get('/health', async () => {
-  return { status: 'ok', service: 'campus-service', timestamp: new Date().toISOString() };
-});
-
-// Registrar rutas del dominio de campus e infraestructura
-server.register(campusRoutes, { prefix: '/api/v1/campus' });
-
-const start = async () => {
   try {
-    const port = Number(process.env.PORT) || 4002;
-    await server.listen({ port, host: '0.0.0.0' });
-    console.log(`[campus-service] Escuchando en http://localhost:${port}`);
+    await app.listen({ port: config.port, host: '0.0.0.0' });
   } catch (err) {
-    server.log.error(err);
+    app.log.error(err);
     process.exit(1);
   }
-};
+}
 
-start();
+void start();
