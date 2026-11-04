@@ -1,5 +1,5 @@
 import argon2 from 'argon2';
-import type { IPasswordHasher } from '../models/domain/types';
+import type { IPasswordHasher } from '../../models/domain/types';
 
 /**
  * Adaptador de hashing basado en Argon2id (RFC 9106)

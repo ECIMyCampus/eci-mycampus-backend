@@ -14,7 +14,7 @@ export default defineConfig({
         'src/shared/database/**',
         'src/shared/utils/logger.ts',
         'src/modules/*/repositories/prisma/**',
-        'src/modules/auth/lib/**',
+        'src/modules/auth/adapters/impl/argon2-password-hasher.ts',
         'src/modules/auth/models/domain/types.ts',
         'src/modules/auth/repositories/user.repository.ts',
         'src/modules/auth/services/auth.service.ts',

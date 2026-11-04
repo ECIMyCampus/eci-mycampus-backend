@@ -39,7 +39,7 @@ describe('Auth API (Endpoints, Guards y Manejo de Errores)', () => {
     const mapper = new AuthMapper();
 
     app = await buildApp(config, () => ({
-      modules: [authHttpModule({ authService: service, authMapper: mapper, passwordHasher: hasher })],
+      modules: [authHttpModule({ authService: service, authMapper: mapper })],
       dispose: async () => {},
     }));
   });

@@ -1,6 +1,6 @@
 import { ResourceNotFoundException, UnauthorizedException } from '../../../../shared/errors/app.exception';
-import type { IPasswordHasher } from '../../models/domain/types';
-import type { User } from '../../models/domain/user';
+import type { IPasswordHasher, UserRegistration } from '../../models/domain/types';
+import { User } from '../../models/domain/user';
 import type { IUserRepository } from '../../repositories/user.repository';
 import type { IAuthValidator } from '../../validators/auth.validator';
 import type { IAuthService, LoginParams } from '../auth.service';
@@ -12,9 +12,18 @@ export class AuthServiceImpl implements IAuthService {
     private readonly passwordHasher: IPasswordHasher,
   ) {}
 
-  async register(draftUser: User): Promise<User> {
-    await this.validator.validateRegistration(draftUser.email);
-    const created = await this.userRepository.create(draftUser);
+  async register(registration: UserRegistration): Promise<User> {
+    await this.validator.validateRegistration(registration.email);
+    const created = await this.userRepository.create(
+      new User({
+        email: registration.email,
+        passwordHash: await this.passwordHasher.hash(registration.password),
+        role: 'ESTUDIANTE',
+        isActive: true,
+        isEmailVerified: false,
+        profile: registration.profile,
+      }),
+    );
 
     if (created.id) {
       await this.userRepository.logAudit({

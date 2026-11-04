@@ -41,7 +41,6 @@ describe('Contrato de identidad entre auth y events', () => {
         authHttpModule({
           authService: new AuthServiceImpl(users, new AuthValidatorImpl(users), hasher),
           authMapper: new AuthMapper(),
-          passwordHasher: hasher,
         }),
         eventsHttpModule(
           new EventsServiceImpl(

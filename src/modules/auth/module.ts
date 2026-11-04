@@ -2,10 +2,9 @@ import type { PrismaClient } from '@prisma/client';
 import type { ErrorMessages } from '../../shared/errors/error-handler';
 import type { AppModule } from '../../shared/http/app-module';
 import { AuthController } from './controllers/auth.controller';
-import { Argon2PasswordHasher } from './lib/password';
+import { Argon2PasswordHasher } from './adapters/impl/argon2-password-hasher';
 import { AuthMapper } from './mappers/auth.mapper';
 import { UserEntityMapper } from './mappers/user-entity.mapper';
-import type { IPasswordHasher } from './models/domain/types';
 import { PrismaUserRepository } from './repositories/prisma/prisma-user.repository';
 import { authRoutes } from './routes/auth.routes';
 import type { IAuthService } from './services/auth.service';
@@ -22,14 +21,13 @@ const ERROR_MESSAGES: ErrorMessages = {
 export interface AuthHttpDependencies {
   authService: IAuthService;
   authMapper: AuthMapper;
-  passwordHasher: IPasswordHasher;
 }
 
 /** Publica la API HTTP del módulo a partir de sus dependencias (las pruebas inyectan dobles). */
-export function authHttpModule({ authService, authMapper, passwordHasher }: AuthHttpDependencies): AppModule {
+export function authHttpModule({ authService, authMapper }: AuthHttpDependencies): AppModule {
   return {
     prefix: '/api/v1/auth',
-    routes: authRoutes(new AuthController(authService, authMapper, passwordHasher)),
+    routes: authRoutes(new AuthController(authService, authMapper)),
     errorMessages: ERROR_MESSAGES,
   };
 }
@@ -37,10 +35,12 @@ export function authHttpModule({ authService, authMapper, passwordHasher }: Auth
 /** Conecta el módulo con sus implementaciones reales. */
 export function createAuthModule(prisma: PrismaClient): AppModule {
   const repository = new PrismaUserRepository(prisma, new UserEntityMapper());
-  const passwordHasher = new Argon2PasswordHasher();
   return authHttpModule({
-    authService: new AuthServiceImpl(repository, new AuthValidatorImpl(repository), passwordHasher),
+    authService: new AuthServiceImpl(
+      repository,
+      new AuthValidatorImpl(repository),
+      new Argon2PasswordHasher(),
+    ),
     authMapper: new AuthMapper(),
-    passwordHasher,
   });
 }
