@@ -1,5 +1,6 @@
 import type { Event } from './event';
-import type { EventCategory, RegistrationStatus, ReportStatus, UserRole } from './enums';
+import type { Actor } from '../../../../shared/security/identity';
+import type { EventCategory, RegistrationStatus, ReportStatus } from './enums';
 
 export interface Registration {
   id: string;
@@ -27,15 +28,7 @@ export interface EventWithStats {
   favoritesCount: number;
 }
 
-/** Usuario autenticado tal como lo entiende el dominio (independiente del JWT). */
-export interface Actor {
-  id: string;
-  email: string | null;
-  fullName: string | null;
-  role: UserRole;
-  facultyId: string | null;
-  isAuthorizedOrganizer: boolean;
-}
+export type { Actor };
 
 /** Criterios del Radar ya normalizados (sin detalles HTTP). */
 export interface RadarCriteria {

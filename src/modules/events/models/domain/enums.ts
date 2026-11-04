@@ -35,6 +35,5 @@ export type ReportStatus = (typeof REPORT_STATUSES)[number];
 
 export type TemporalStatus = 'EN_CURSO' | 'PROXIMO' | 'FINALIZADO';
 
-export const USER_ROLES = ['INVITADO', 'ESTUDIANTE', 'DOCENTE', 'ENTRENADOR', 'MODERADOR', 'ADMIN'] as const;
-export type UserRole = (typeof USER_ROLES)[number];
+export { USER_ROLES, type UserRole } from '../../../../shared/security/identity';
 
