@@ -1,6 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 import type { ErrorMessages } from '../../shared/errors/error-handler';
 import type { AppModule } from '../../shared/http/app-module';
+import type { AppLogger } from '../../shared/utils/logger';
 import { AuthController } from './controllers/auth.controller';
 import { Argon2PasswordHasher } from './adapters/impl/argon2-password-hasher';
 import { AuthMapper } from './mappers/auth.mapper';
@@ -33,13 +34,14 @@ export function authHttpModule({ authService, authMapper }: AuthHttpDependencies
 }
 
 /** Conecta el módulo con sus implementaciones reales. */
-export function createAuthModule(prisma: PrismaClient): AppModule {
+export function createAuthModule(prisma: PrismaClient, logger: AppLogger): AppModule {
   const repository = new PrismaUserRepository(prisma, new UserEntityMapper());
   return authHttpModule({
     authService: new AuthServiceImpl(
       repository,
       new AuthValidatorImpl(repository),
       new Argon2PasswordHasher(),
+      logger,
     ),
     authMapper: new AuthMapper(),
   });

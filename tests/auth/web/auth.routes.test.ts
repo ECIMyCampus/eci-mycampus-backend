@@ -6,7 +6,7 @@ import type { AppConfig } from '../../../src/config/env';
 import { AuthMapper } from '../../../src/modules/auth/mappers/auth.mapper';
 import { AuthServiceImpl } from '../../../src/modules/auth/services/impl/auth.service.impl';
 import { AuthValidatorImpl } from '../../../src/modules/auth/validators/impl/auth.validator.impl';
-import { buildUser, InMemoryUserRepository, MockPasswordHasher } from '../support/fixtures';
+import { buildUser, InMemoryUserRepository, MockPasswordHasher, silentLogger } from '../support/fixtures';
 
 const config: AppConfig = {
   nodeEnv: 'test',
@@ -35,7 +35,7 @@ describe('Auth API (Endpoints, Guards y Manejo de Errores)', () => {
     repository = new InMemoryUserRepository();
     hasher = new MockPasswordHasher();
     const validator = new AuthValidatorImpl(repository);
-    const service = new AuthServiceImpl(repository, validator, hasher);
+    const service = new AuthServiceImpl(repository, validator, hasher, silentLogger);
     const mapper = new AuthMapper();
 
     app = await buildApp(config, () => ({

@@ -10,6 +10,7 @@ describe('AuthServiceImpl', () => {
   let validator: AuthValidatorImpl;
   let hasher: MockPasswordHasher;
   let service: AuthServiceImpl;
+  const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
   const registrationFor = (email: string) => ({
     email,
@@ -29,7 +30,7 @@ describe('AuthServiceImpl', () => {
     repository = new InMemoryUserRepository();
     validator = new AuthValidatorImpl(repository);
     hasher = new MockPasswordHasher();
-    service = new AuthServiceImpl(repository, validator, hasher);
+    service = new AuthServiceImpl(repository, validator, hasher, logger);
   });
 
   describe('register', () => {
@@ -58,6 +59,18 @@ describe('AuthServiceImpl', () => {
       const hash = vi.spyOn(hasher, 'hash');
       await expect(service.register(registrationFor(existing.email))).rejects.toThrow(ConflictException);
       expect(hash).not.toHaveBeenCalled();
+    });
+
+    it('un fallo de auditoría no interrumpe el registro y queda en el log', async () => {
+      // Arrange
+      vi.spyOn(repository, 'logAudit').mockRejectedValueOnce(new Error('sin conexión'));
+
+      // Act
+      const created = await service.register(registrationFor('b@mail.escuelaing.edu.co'));
+
+      // Assert
+      expect(created.id).toBeDefined();
+      expect(logger.error).toHaveBeenCalledOnce();
     });
   });
 

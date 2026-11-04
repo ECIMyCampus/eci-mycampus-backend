@@ -14,7 +14,7 @@ export function buildContainer(config: AppConfig, logger: AppLogger): AppContain
 
   return {
     modules: [
-      createAuthModule(prisma),
+      createAuthModule(prisma, logger),
       createCampusModule(prisma),
       createEventsModule({
         prisma,

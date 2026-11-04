@@ -1,5 +1,6 @@
 import { ResourceNotFoundException, UnauthorizedException } from '../../../../shared/errors/app.exception';
-import type { IPasswordHasher, UserRegistration } from '../../models/domain/types';
+import type { AppLogger } from '../../../../shared/utils/logger';
+import type { AuditLogEntry, IPasswordHasher, UserRegistration } from '../../models/domain/types';
 import { User } from '../../models/domain/user';
 import type { IUserRepository } from '../../repositories/user.repository';
 import type { IAuthValidator } from '../../validators/auth.validator';
@@ -10,6 +11,7 @@ export class AuthServiceImpl implements IAuthService {
     private readonly userRepository: IUserRepository,
     private readonly validator: IAuthValidator,
     private readonly passwordHasher: IPasswordHasher,
+    private readonly logger: AppLogger,
   ) {}
 
   async register(registration: UserRegistration): Promise<User> {
@@ -26,15 +28,13 @@ export class AuthServiceImpl implements IAuthService {
     );
 
     if (created.id) {
-      await this.userRepository.logAudit({
+      await this.audit({
         actorId: created.id,
         action: 'USER_REGISTERED',
         targetEntity: 'User',
         targetId: created.id,
         payload: { email: created.email, role: created.role },
         ipAddress: 'internal',
-      }).catch(() => {
-        // Auditoría no bloquea el flujo principal
       });
     }
 
@@ -55,13 +55,13 @@ export class AuthServiceImpl implements IAuthService {
     }
 
     if (user.id) {
-      await this.userRepository.logAudit({
+      await this.audit({
         actorId: user.id,
         action: 'USER_LOGIN',
         targetEntity: 'User',
         targetId: user.id,
         ipAddress: params.ipAddress ?? 'unknown',
-      }).catch(() => {});
+      });
     }
 
     return user;
@@ -73,6 +73,15 @@ export class AuthServiceImpl implements IAuthService {
       throw new ResourceNotFoundException(`Usuario con ID '${id}' no encontrado.`);
     }
     return user;
+  }
+
+  /** La auditoría no bloquea el flujo principal, pero su fallo debe quedar registrado. */
+  private async audit(entry: AuditLogEntry): Promise<void> {
+    try {
+      await this.userRepository.logAudit(entry);
+    } catch (err) {
+      this.logger.error({ err, action: entry.action, targetId: entry.targetId }, 'No se pudo registrar la auditoría');
+    }
   }
 }
 
