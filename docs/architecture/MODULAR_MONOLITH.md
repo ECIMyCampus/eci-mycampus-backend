@@ -69,10 +69,10 @@ Cada módulo expone **un único punto de entrada**, `modules/<nombre>/index.ts`.
 
 | Desde | Puede importar |
 | :--- | :--- |
-| `modules/X/**` | Sus propios archivos, `shared/**`, `config/env` (solo tipos) y `modules/Y/index.ts` |
-| `shared/**` | `shared/**` y `config/env` (solo tipos). **Nunca** `modules/**` |
+| `modules/X/**` | Sus propios archivos, `shared/**` y `modules/Y/index.ts`. La configuración llega por constructor |
+| `shared/**` | `shared/**` y `config/env` (solo tipos). **Nunca** `modules/**`, `app` ni `container` |
 | `app.ts`, `container.ts`, `server.ts` | Todo, a través de `modules/*/index.ts` |
-| `modules/X/models/domain/**` | Solo el propio dominio y `shared/security`. Nunca Fastify ni Prisma |
+| `modules/X/models/domain/**` | El propio dominio, `shared/security` y `shared/errors`. Nunca Fastify, Prisma, Zod ni repositorios |
 
 `tests/architecture/module-boundaries.test.ts` hace cumplir estas reglas: una importación ilegal rompe la suite. Hoy ningún módulo importa a otro.
 
@@ -121,6 +121,8 @@ Se conservan rutas, códigos, cuerpos y mensajes bajo `/api/v1/*`. Para mantener
 | :--- | :--- | :--- |
 | Tres `/health` en los puertos 4001, 4002 y 4003, con `service: <nombre>` | Un `/health` en el puerto 4000 con `service: "eci-mycampus-backend"` | Hay un solo proceso |
 | Tres `/docs` | Un `/docs` con todos los endpoints | Hay un solo proceso |
+| `detalles[].mensaje` con el texto en inglés de Zod 3 cuando el campo no tiene mensaje propio, por ejemplo `Required` | Texto de Zod 4, por ejemplo `Invalid input: expected string, received undefined`. También puede variar el número de entradas en casos límite | La actualización cierra una vulnerabilidad alta de Zod. Los clientes deben usar `campo`, no estos textos |
+| `/auth/me` aceptaba cualquier JWT bien firmado | Exige el contrato `JwtClaims` | Un solo guard. Los tokens que emite `/login` siempre lo cumplen; solo se rechazan los firmados fuera del sistema con otros claims |
 
 ## Pruebas
 
