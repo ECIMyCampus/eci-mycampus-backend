@@ -28,7 +28,7 @@ export const EventCreationRequestSchema = z
     title: z.string().trim().min(5, 'El título debe tener al menos 5 caracteres').max(150),
     description: z.string().trim().min(10, 'La descripción debe tener al menos 10 caracteres').max(5000),
     category: z.enum(EVENT_CATEGORIES),
-    facultyId: z.string().uuid('Identificador de facultad no válido').optional(),
+    facultyId: z.guid('Identificador de facultad no válido').optional(),
     buildingId: z.string().trim().min(1, 'El edificio es obligatorio'),
     specificLocation: z.string().trim().min(2, 'La ubicación específica (salón/piso) es obligatoria'),
     startTime: isoDatetime('Fecha de inicio no válida (ISO-8601)'),
@@ -43,7 +43,7 @@ export const EventCreationRequestSchema = z
   .strict();
 
 export const RadarFilterRequestSchema = z.object({
-  facultyId: z.string().uuid('Identificador de facultad no válido').optional(),
+  facultyId: z.guid('Identificador de facultad no válido').optional(),
   category: z.enum(EVENT_CATEGORIES).optional(),
   date: z
     .string()
@@ -53,7 +53,7 @@ export const RadarFilterRequestSchema = z.object({
 });
 
 export const EventIdParamsSchema = z.object({
-  id: z.string().uuid('ID de evento no válido'),
+  id: z.guid('ID de evento no válido'),
 });
 
 export const EventRejectionRequestSchema = z
