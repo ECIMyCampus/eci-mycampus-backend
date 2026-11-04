@@ -5,7 +5,7 @@ const REQUIRED = { DATABASE_URL: 'postgresql://x', JWT_SECRET: 'secreto_de_prueb
 
 describe('loadConfig (fail-fast de variables de entorno)', () => {
   it('aplica valores por defecto en desarrollo', () => {
-    const config = loadConfig(REQUIRED);
+    const config = loadConfig({ ...REQUIRED, NODE_ENV: 'development' });
 
     expect(config.port).toBe(4000);
     expect(config.corsOrigin).toBe(true);
@@ -28,7 +28,14 @@ describe('loadConfig (fail-fast de variables de entorno)', () => {
     const JWT_SECRET = 'dev_jwt_secret_key_for_eci_mycampus_local_only';
 
     expect(() => loadConfig({ ...REQUIRED, JWT_SECRET, NODE_ENV: 'production' })).toThrow('valor de ejemplo');
-    expect(loadConfig({ ...REQUIRED, JWT_SECRET }).jwtSecret).toBe(JWT_SECRET);
+    expect(loadConfig({ ...REQUIRED, JWT_SECRET, NODE_ENV: 'development' }).jwtSecret).toBe(JWT_SECRET);
+  });
+
+  it('sin NODE_ENV explícito no acepta el secreto de ejemplo ni habilita CORS', () => {
+    const JWT_SECRET = 'dev_jwt_secret_key_for_eci_mycampus_local_only';
+
+    expect(() => loadConfig({ ...REQUIRED, JWT_SECRET })).toThrow('valor de ejemplo');
+    expect(loadConfig(REQUIRED).corsOrigin).toBe(false);
   });
 
   it('separa múltiples orígenes CORS', () => {
