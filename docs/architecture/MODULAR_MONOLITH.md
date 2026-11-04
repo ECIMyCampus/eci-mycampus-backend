@@ -6,6 +6,7 @@ Un solo proceso de backend desplegable, con módulos independientes a nivel lóg
 
 ```mermaid
 flowchart TB
+    M["App móvil (repo propio, previsto)"] --> API
     B[Navegador] --> W["eci-mycampus-web (repo propio)<br/>Next.js, rewrites /api/v1/*"]
     W --> API
 
@@ -101,7 +102,7 @@ sequenceDiagram
 - **Una base PostgreSQL y un `PrismaClient`** compartido, creado en `container.ts`.
 - **Un esquema PostgreSQL por módulo**, igual que hasta ahora, y un archivo Prisma por módulo en `prisma/schema/`.
 - **Sin claves foráneas entre esquemas.** Las referencias como `Event.buildingId` siguen siendo lógicas: mantienen los módulos separables.
-- **Migraciones centralizadas** en `prisma/migrations`, un único historial.
+- **Migraciones centralizadas** en `prisma/schema/migrations`, un único historial. Prisma exige que estén junto al archivo del datasource.
 - **Una transacción no cruza módulos.** Si algún caso de uso lo necesitara, se debe tratar como una decisión explícita y registrarla.
 
 ## Configuración
@@ -129,6 +130,10 @@ Se conservan rutas, códigos, cuerpos y mensajes bajo `/api/v1/*`. Para mantener
 | Web | `tests/<módulo>/web` | No, con repositorios en memoria | Endpoints, guards, contratos, errores |
 | Arquitectura | `tests/architecture` | No | Límites entre módulos |
 | Integración | `tests/integration` | **Sí**, se omite sin `TEST_DATABASE_URL` | Consultas reales y concurrencia de cupos |
+
+## Clientes
+
+La API es el contrato común. La web llega por rewrites de Next.js; la app móvil, cliente principal previsto, llamará directamente a `/api/v1/*` con tokens Bearer (ADR-008). Por eso el backend debe poder exponerse públicamente sin depender de la web, y las protecciones de borde como el límite de intentos deben vivir en él.
 
 ## Evolución futura
 
