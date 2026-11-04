@@ -36,13 +36,6 @@ export const LoginRequestSchema = z
   })
   .strict();
 
-export const RecoverPasswordRequestSchema = z
-  .object({
-    email: z.string().trim().email('Formato de correo no válido'),
-  })
-  .strict();
-
 export type RegisterRequestDTO = z.infer<typeof RegisterRequestSchema>;
 export type LoginRequestDTO = z.infer<typeof LoginRequestSchema>;
-export type RecoverPasswordRequestDTO = z.infer<typeof RecoverPasswordRequestSchema>;
 
