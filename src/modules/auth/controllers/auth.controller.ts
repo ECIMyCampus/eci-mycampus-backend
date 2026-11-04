@@ -2,6 +2,8 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthMapper } from '../mappers/auth.mapper';
 import type { IPasswordHasher } from '../models/domain/types';
 import type { LoginRequestDTO, RegisterRequestDTO } from '../models/dto/request/auth.request.dto';
+import { currentActor } from '../../../shared/security/auth.guard';
+import type { JwtClaims } from '../../../shared/security/identity';
 import type { IAuthService } from '../services/auth.service';
 
 export class AuthController {
@@ -29,17 +31,15 @@ export class AuthController {
       ipAddress: request.ip,
     });
 
-    const token = await reply.jwtSign(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        facultyId: user.facultyId,
-        isAuthorizedOrganizer: user.isAuthorizedOrganizer,
-        fullName: user.fullName,
-      },
-      { expiresIn: '7d' },
-    );
+    const claims: JwtClaims = {
+      id: user.id!,
+      email: user.email,
+      role: user.role,
+      facultyId: user.facultyId,
+      isAuthorizedOrganizer: user.isAuthorizedOrganizer,
+      fullName: user.fullName,
+    };
+    const token = await reply.jwtSign(claims, { expiresIn: '7d' });
 
     return reply.status(200).send({
       token,
@@ -48,8 +48,7 @@ export class AuthController {
   };
 
   me = async (request: FastifyRequest, reply: FastifyReply) => {
-    const actor = (request as unknown as { user: { id: string } }).user;
-    const user = await this.authService.getUserById(actor.id);
+    const user = await this.authService.getUserById(currentActor(request).id);
     return reply.status(200).send(this.mapper.toResponse(user));
   };
 }
