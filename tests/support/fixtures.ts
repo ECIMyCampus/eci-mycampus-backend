@@ -112,3 +112,4 @@ export class RecordingPublisher implements IDomainEventPublisher {
     this.published.push(event);
   }
 }
+

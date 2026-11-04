@@ -84,3 +84,4 @@ describe('Event · máquina de estados (State Deny-by-Default)', () => {
     expect(event.getTemporalStatus(new Date('2026-11-10T17:00:00.000Z'))).toBe('FINALIZADO');
   });
 });
+

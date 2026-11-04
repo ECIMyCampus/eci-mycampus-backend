@@ -130,3 +130,4 @@ describe('Estrategias de notificación', () => {
     expect(logger.info).toHaveBeenCalledTimes(2);
   });
 });
+

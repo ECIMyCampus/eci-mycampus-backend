@@ -122,3 +122,4 @@ describe('EventsServiceImpl', () => {
     expect(report.id).toBe('report-1');
   });
 });
+

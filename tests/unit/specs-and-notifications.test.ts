@@ -60,3 +60,4 @@ describe('Notificaciones (Observer + Factory + Strategy)', () => {
     expect(() => factory.getStrategy('EMAIL')).toThrow('EMAIL');
   });
 });
+
