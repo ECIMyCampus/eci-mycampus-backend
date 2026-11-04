@@ -1,0 +1,55 @@
+# Environment Variables and Secrets (STRICTLY IGNORED)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Compilation and Build Output
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Logs and Debugging
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing and Code Coverage
+coverage/
+.nyc_output/
+.vitest/
+
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Security Certificates and Keys
+*.pem
+*.key
+*.cert
+*.crt
