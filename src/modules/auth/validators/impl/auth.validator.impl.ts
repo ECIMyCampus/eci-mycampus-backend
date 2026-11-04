@@ -1,4 +1,4 @@
-import { ConflictException, UnauthorizedException } from '../../exceptions/app.exception';
+import { ConflictException, UnauthorizedException } from '../../../../shared/errors/app.exception';
 import type { User } from '../../models/domain/user';
 import type { IUserRepository } from '../../repositories/user.repository';
 import type { IAuthValidator } from '../auth.validator';

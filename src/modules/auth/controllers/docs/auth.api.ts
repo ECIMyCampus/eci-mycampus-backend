@@ -7,7 +7,7 @@ import {
   RegisterResponseSchema,
   UserResponseSchema,
 } from '../../models/dto/response/auth.response.dto';
-import { ErrorResponseSchema } from '../../models/dto/response/error.response.dto';
+import { ErrorResponseSchema } from '../../../../shared/errors/error.response.dto';
 
 const TAG = ['Autenticación'];
 const bearer = [{ bearerAuth: [] }];

@@ -1,4 +1,4 @@
-import { ResourceNotFoundException, UnauthorizedException } from '../../exceptions/app.exception';
+import { ResourceNotFoundException, UnauthorizedException } from '../../../../shared/errors/app.exception';
 import type { IPasswordHasher } from '../../models/domain/types';
 import type { User } from '../../models/domain/user';
 import type { IUserRepository } from '../../repositories/user.repository';
